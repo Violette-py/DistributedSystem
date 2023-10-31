@@ -27,4 +27,9 @@ public class FileDesc {
     public static FileDesc fromString(String str){
         return null;
     }
+
+    public long getId() {
+        return id;
+    }
+
 }
