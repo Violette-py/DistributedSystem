@@ -1,6 +1,6 @@
-import api.NameNode;
-import api.NameNodeHelper;
-import impl.NameNodeImpl;
+import api.DataNode;
+import api.DataNodeHelper;
+import impl.DataNodeImpl;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NameComponent;
@@ -16,7 +16,7 @@ import org.omg.PortableServer.POAPackage.WrongPolicy;
 
 import java.util.Properties;
 
-public class NameNodeLauncher {
+public class DataNodeLauncher {
 
     public static void main(String[] args) {
 
@@ -34,20 +34,21 @@ public class NameNodeLauncher {
             rootpoa.the_POAManager().activate();
 
             // new a object
-            NameNodeImpl nameNodeServant = new NameNodeImpl();
+            DataNodeImpl dataNodeServant = new DataNodeImpl();
 
             // export
-            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(nameNodeServant);
-            NameNode href = NameNodeHelper.narrow(ref);
+            org.omg.CORBA.Object ref = rootpoa.servant_to_reference(dataNodeServant);
+            DataNode href = DataNodeHelper.narrow(ref);
 
             // Naming context
             org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
             // bind to Naming
-            NameComponent[] path = ncRef.to_name("NameNode");
+            NameComponent[] path = ncRef.to_name("DataNode");
             ncRef.rebind(path, href);
-            System.out.println("NameNode is ready and waiting...");
+
+            System.out.println("DataNode is ready and waiting...");
 
             // waiting
             orb.run();

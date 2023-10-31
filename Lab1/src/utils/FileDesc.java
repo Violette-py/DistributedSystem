@@ -11,7 +11,7 @@ public class FileDesc {
      * after a while client1 call close() with the FileDesc of id 0x889.
      * client2 tries again and get a new FileDesc with a new id 0x88a
      */
-    final long id;
+    private final long id;
 
     public FileDesc(long id) {
         this.id = id;
@@ -19,13 +19,33 @@ public class FileDesc {
 
 
     /* The following method is for conversion, so we can have interface that return string, which is easy to write in idl */
+//    @Override
+//    public String toString() {
+//        return null;
+//    }
+//
+//    public static FileDesc fromString(String str){
+//        return null;
+//    }
+
     @Override
     public String toString() {
-        return null;
+        return Long.toString(id);
     }
 
-    public static FileDesc fromString(String str){
-        return null;
+    public static FileDesc fromString(String str) {
+        if (str == null) {
+            throw new IllegalArgumentException("Invalid input string: null");
+        }
+
+        long id;
+        try {
+            id = Long.parseLong(str);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input string: " + str);
+        }
+
+        return new FileDesc(id);
     }
 
     public long getId() {
