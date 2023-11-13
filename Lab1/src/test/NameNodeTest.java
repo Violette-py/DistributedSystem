@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 
 public class NameNodeTest {
     private static NameNodeImpl nn;
-    private void close(FileDesc... fileInfos){
+    private void close(FileDesc... fileInfos){ // 可变参数：可以接收任意数量的 FileDesc参数
         for(FileDesc fileInfo: fileInfos){
             nn.close(fileInfo.toString());
         }
@@ -20,6 +20,10 @@ public class NameNodeTest {
     public void setUp(){
         nn = new NameNodeImpl();
     }
+
+    /* mode: xy (2 bit)
+     * x - write
+     * y - read */
 
     @Test
     /* open a non-exist file */
@@ -34,22 +38,21 @@ public class NameNodeTest {
     /* open an existing file */
     public void testOpen(){
         String filename = FileSystem.newFilename();
-        FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));
-        FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b01));
-        assertNotSame(fileInfo,fileInfo2);
+        FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));  // 写文件
+        FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b01)); // 读文件
+        // 可以同时读写，是因为写的是在内存中，而读的是在硬盘中，互不干扰（写只有在close之后才会持久化到硬盘里）
+        assertNotSame(fileInfo,fileInfo2); // FileDesc的id不同
         close(fileInfo, fileInfo2);
     }
-
-
 
     @Test
     /* open an existing and being written file in writing mode */
     public void testOpenWrite(){
         String filename = FileSystem.newFilename();
-        FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));
-        FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b11));
+        FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));  // 写文件
+        FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b11)); // 同时读写
         assertNotNull(fileInfo);
-        assertNull(fileInfo2);
+        assertNull(fileInfo2); // 一个文件至多只能有一个写的 open请求
         close(fileInfo);
     }
 

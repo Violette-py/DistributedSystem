@@ -38,6 +38,7 @@ public class DataNodeImpl extends DataNodePOA {
 //        }
 //    }
 
+    /* 读取某个数据块的所有数据 */
     @Override
     public byte[] read(int block_id) {
         if (blockToFileMap.containsKey(block_id)) {
@@ -57,7 +58,8 @@ public class DataNodeImpl extends DataNodePOA {
         return new byte[0];
     }
 
-    /* 向某个数据块末尾写入or追加数据 */
+    /* 向某个数据块末尾追加数据 */
+    // FIXME: 如果该数据块不存在应该如何处理？
     @Override
     public void append(int block_id, byte[] bytes) {
         String filePath = dataDirectory + File.separator + "block_" + block_id + ".dat";

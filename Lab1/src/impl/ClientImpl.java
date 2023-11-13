@@ -1,8 +1,9 @@
 package impl;
-//TODO: your implementation
+// TODO: your implementation
 import api.Client;
 public class ClientImpl implements Client{
 
+    // 返回的是 fd，也即 FileDesc中的 id
     @Override
     public int open(String filepath, int mode) {
         return 0;
