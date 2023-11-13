@@ -10,6 +10,7 @@ import utils.FsImageXmlHandler;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class NameNodeImpl extends NameNodePOA {
 //    public synchronized String open(String filepath, int mode) {
 //    public String open(String filepath, int mode) {
 
-        // 检查当前路径文件是否存在（查询 FsImage），不存在则新建
+    // 检查当前路径文件是否存在（查询 FsImage），不存在则新建
 
 //        if (openFiles.containsKey(filepath)) {
 //            FileDesc existingFile = openFiles.get(filepath);
@@ -67,14 +68,14 @@ public class NameNodeImpl extends NameNodePOA {
         if (fileMetadata != null) {
             // 文件存在，返回文件的元数据信息
             long fileId = counter++;
-            FileDesc fileDesc = new FileDesc(fileId, fileMetadata, mode);
+            FileDesc fileDesc = new FileDesc(fileId, mode, fileMetadata);
             openFiles.put(fileId, fileDesc);
             return fileDesc.toString();
         } else {
             // 文件不存在，新建文件
             FileMetadata newFileMetadata = createNewFile(filepath);
             long fileId = counter++;
-            FileDesc fileDesc = new FileDesc(fileId, newFileMetadata, mode);
+            FileDesc fileDesc = new FileDesc(fileId, mode, newFileMetadata);
             openFiles.put(fileId, fileDesc);
             return fileDesc.toString();
         }
@@ -102,8 +103,8 @@ public class NameNodeImpl extends NameNodePOA {
 
         // FIXME: 这里的创建到底是指在哪里创建？
 
-        FileMetadata newFile = new FileMetadata();
-        newFile.setFilepath(filepath);
+        FileMetadata newFile = new FileMetadata(filepath, 0, new ArrayList<>());
+//        newFile.setFilepath(filepath);
         // 设置其他元数据信息，如大小、创建时间等
         return newFile;
     }

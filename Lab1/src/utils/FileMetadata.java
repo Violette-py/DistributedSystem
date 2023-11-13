@@ -9,11 +9,27 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FileMetadata {
     private String filepath;
-    private long fileSize;
-    private List<DataBlock> dataBlocks;
-    private Date createTime;
-    private Date modifyTime;
-    private Date accessTime;
+    private long fileSize;    // 文件大小
+    private List<DataBlock> dataBlocks;  // 文件块所在位置（哪个DataNode上的哪个block）
+    private Date createTime; // 创建时间
+    private Date modifyTime; // 修改时间
+    private Date accessTime; // 访问时间   // FIXME: 是否需要更新成现在？ 还是说是 close完才算一次访问？
+
+    // FIXME: 需要再写一个构造函数，首次创建文件时，设置创建时间（而不是作为参数传入）
+    public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks) {
+        this.filepath = filepath;
+        this.fileSize = fileSize;
+        this.dataBlocks = dataBlocks;
+    }
+
+    public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks, Date createTime, Date modifyTime, Date accessTime) {
+        this.filepath = filepath;
+        this.fileSize = fileSize;
+        this.dataBlocks = dataBlocks;
+        this.createTime = createTime;
+        this.modifyTime = modifyTime;
+        this.accessTime = accessTime;
+    }
 
     // Getters and setters for all fields
 

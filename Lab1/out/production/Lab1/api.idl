@@ -9,7 +9,7 @@ module api {
     };
     interface NameNode{
         // TODO: complete the interface design
-        string open(in string filepath, in long mode);
+        string open(in string filepath, in long mode);  // FIXME: mode是 long还是 int类
         void close(in string fileInfo);
     };
 };
