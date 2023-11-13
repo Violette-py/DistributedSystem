@@ -27,7 +27,8 @@ public class ClientTest {
         client.close(fd);
     }
 
-    @Test void testWriteFail(){
+    @Test
+    public void testWriteFail(){
         String filename = FileSystem.newFilename();
         int fd = client.open(filename,0b01);
         client.append(fd,"Lala-land".getBytes(StandardCharsets.UTF_8));
@@ -35,7 +36,8 @@ public class ClientTest {
         client.close(fd);
     }
 
-    @Test void testReadFail(){
+    @Test
+    public void testReadFail(){
         String filename = FileSystem.newFilename();
         int fd = client.open(filename,0b10);
         assertNull(client.read(fd));

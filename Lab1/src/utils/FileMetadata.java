@@ -11,11 +11,12 @@ public class FileMetadata {
     private String filepath;
     private long fileSize;    // 文件大小
     private List<DataBlock> dataBlocks;  // 文件块所在位置（哪个DataNode上的哪个block）
-    private Date createTime; // 创建时间
-    private Date modifyTime; // 修改时间
-    private Date accessTime; // 访问时间   // FIXME: 是否需要更新成现在？ 还是说是 close完才算一次访问？
+    private Date createTime; // 创建时间 -- 只在 NameNode的 createNewFile函数中第一次设置
+    private Date modifyTime; // 修改时间 -- append操作完成后
+    private Date accessTime; // 访问时间 -- 每一次 open请求时
+    // 以上时间都是最近一次的时间
 
-    // FIXME: 需要再写一个构造函数，首次创建文件时，设置创建时间（而不是作为参数传入）
+    // 时间应该是动态设置的，而非作为参数传入
     public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks) {
         this.filepath = filepath;
         this.fileSize = fileSize;

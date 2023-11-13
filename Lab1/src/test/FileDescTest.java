@@ -16,6 +16,11 @@ public class FileDescTest {
 
     @Test
     public void testToString() {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println("date is : " + date.toString());               // Mon Nov 13 17:05:59 CST 2023
+        System.out.println("after format : " + dateFormat.format(date));  // 2023-11-13 17:05:59
+
         // 创建测试数据
         List<FileMetadata.DataBlock> dataBlocks = new ArrayList<>();
         dataBlocks.add(new FileMetadata.DataBlock(1, 100));

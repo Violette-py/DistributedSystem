@@ -40,7 +40,7 @@ public class NameNodeTest {
         String filename = FileSystem.newFilename();
         FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));  // 写文件
         FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b01)); // 读文件
-        // 可以同时读写，是因为写的是在内存中，而读的是在硬盘中，互不干扰（写只有在close之后才会持久化到硬盘里）
+        // FIXME: 同时读写不会有 bug吗？难道要加锁？？？
         assertNotSame(fileInfo,fileInfo2); // FileDesc的id不同
         close(fileInfo, fileInfo2);
     }

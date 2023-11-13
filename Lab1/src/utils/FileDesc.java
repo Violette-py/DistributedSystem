@@ -18,11 +18,11 @@ public class FileDesc {
      */
 
     /* 上面这个例子已经说明了，相同的文件被返回了不同的 id，那么就可以把这里的 id理解成 fd */
-    private final long id;
+    private final long id;   // 文件 fd （每个合法的 open请求都会唯一分配一个）
     private FileMetadata fileMetadata;
-    private long mode;        // 读写模式 -- 这是和 FIleMetadata不同的地方；在内存中操作
+    private int mode;       // 读写模式
 
-    public FileDesc(long id, long mode, FileMetadata fileMetadata) {
+    public FileDesc(long id, int mode, FileMetadata fileMetadata) {
         this.id = id;
         this.mode = mode;
         this.fileMetadata = fileMetadata;
@@ -50,7 +50,7 @@ public class FileDesc {
     public static FileDesc fromString(String str) {
         String[] parts = str.split(",");
         long id = Long.parseLong(parts[0]);
-        long mode = Integer.parseInt(parts[1]);
+        int mode = Integer.parseInt(parts[1]);
         String filepath = parts[2];
         long fileSize = Long.parseLong(parts[3]);
         List<FileMetadata.DataBlock> dataBlocks = stringToDataBlocks(parts[4]);
@@ -105,7 +105,7 @@ public class FileDesc {
         return id;
     }
 
-    public long getMode() {
+    public int getMode() {
         return mode;
     }
 
