@@ -43,12 +43,12 @@ public class NameNodeImpl extends NameNodePOA {
         // 若文件不存在于磁盘中
         if (fileMetadata == null) {
 
-            System.out.println("before search in memory");
+            System.out.println("file is not in disk");
 
             // 查找内存中是否有该文件（其他客户端创建但还未持久化到 FsImage中）
             for (FileDesc existingFile : openFiles) {
                 if (existingFile.getFileMetadata().getFilepath().equals(filepath)) {
-                    System.out.println("error here");
+                    System.out.println("file is created but still not stored in FsImage");
                     if (isWriteMode(mode) && isWriteMode(existingFile.getMode())) {
                         // 文件正在被写入，不允许其他客户端以写模式打开
                         return null;
@@ -61,14 +61,18 @@ public class NameNodeImpl extends NameNodePOA {
                     }
                 }
             }
-
+            System.out.println("file is not in memory");
+            System.out.println("so now create it ...");
             // 磁盘和内存中均没有对应文件，则新建
             fileMetadata = createNewFile(filepath);
+//            System.out.println("new created file : " + fileMetadata);
         }
 
         // 生成新的文件描述符（FileDesc）
         FileDesc fileDesc = new FileDesc(counter++, mode, fileMetadata);
         openFiles.add(fileDesc);
+
+        System.out.println("new created fileDesc : " + fileDesc);
 
         // 返回文件描述符的字符串表示形式
         return fileDesc.toString();
@@ -94,10 +98,13 @@ public class NameNodeImpl extends NameNodePOA {
 
     /* 在 FsImage中查找文件 */
     private FileMetadata findFileInDisk(String filepath) {
-        System.out.println("before loadFsImage");
+//        System.out.println("before loadFsImage");
         FsImage fsImage = loadFsImage();
-        System.out.println("after loadFsImage");
-        System.out.println("fsImage is : " + fsImage);
+//        System.out.println("after loadFsImage");
+//        System.out.println("fsImage.file is : " + fsImage.getFiles());
+//        for (FileMetadata fileMetadata : fsImage.getFiles()) {
+//            System.out.println("file path is : " + fileMetadata.getFilepath());
+//        }
 
         for (FileMetadata fileMetadata : fsImage.getFiles()) {
             if (fileMetadata.getFilepath().equals(filepath)) {
@@ -119,12 +126,14 @@ public class NameNodeImpl extends NameNodePOA {
         FsImage fsImageTemp = null;
         File xmlFile = new File("src/resources/FsImage.xml"); // TODO: 提取成常量
         if (xmlFile.exists()) {
+            System.out.println("xmlFile exist");
             try {
                 fsImageTemp = FsImageXmlHandler.unmarshal(xmlFile);  // 从 xml文件中读取 FsImage对象
             } catch (JAXBException e) {
                 e.printStackTrace();
             }
         } else {
+            System.out.println("xmlFile not exist");
             fsImageTemp = new FsImage(); // 若 xml文件不存在  // TODO: 项目启动时，是否需要写一个 xml文件的初始化
         }
         return fsImageTemp;

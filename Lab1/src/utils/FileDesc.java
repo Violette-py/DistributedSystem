@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 // TODO: According to your design, complete the FileDesc class, which wraps the information returned by NameNode open()
 public class FileDesc {
@@ -19,8 +20,8 @@ public class FileDesc {
 
     /* 上面这个例子已经说明了，相同的文件被返回了不同的 id，那么就可以把这里的 id理解成 fd */
     private final long id;   // 文件 fd （每个合法的 open请求都会唯一分配一个）
-    private FileMetadata fileMetadata;
     private int mode;       // 读写模式
+    private FileMetadata fileMetadata;
 
     public FileDesc(long id, int mode, FileMetadata fileMetadata) {
         this.id = id;
@@ -48,11 +49,20 @@ public class FileDesc {
 
     /* 按照一定格式从字符串中解析出 FileDesc的信息 */
     public static FileDesc fromString(String str) {
+        if (str == null) {
+            return null;
+        }
+
         String[] parts = str.split(",");
         long id = Long.parseLong(parts[0]);
         int mode = Integer.parseInt(parts[1]);
         String filepath = parts[2];
         long fileSize = Long.parseLong(parts[3]);
+//        System.out.println("parts[2] : " + parts[2]);
+//        System.out.println("parts[3] : " + parts[3]);
+//        System.out.println("parts[4] : " + parts[4]);
+//        System.out.println("parts[5] : " + parts[5]);
+//        System.out.println("if parts[4] is null : " + (Objects.equals(parts[4], "")));
         List<FileMetadata.DataBlock> dataBlocks = stringToDataBlocks(parts[4]);
         Date createTime = stringToDate(parts[5]);
         Date modifyTime = stringToDate(parts[6]);
@@ -65,7 +75,7 @@ public class FileDesc {
     private static String dataBlocksToString(List<FileMetadata.DataBlock> dataBlocks) {
         StringBuilder sb = new StringBuilder();
         for (FileMetadata.DataBlock block : dataBlocks) {
-            sb.append(block.getDataNodeId()).append(":").append(block.getBlockId()).append(";");
+            sb.append(block.getDataNodeID()).append(":").append(block.getBlockID()).append(";");
         }
         return sb.toString();
     }
@@ -73,12 +83,14 @@ public class FileDesc {
     // 辅助方法：将字符串转换为 List<DataBlock>
     private static List<FileMetadata.DataBlock> stringToDataBlocks(String str) {
         List<FileMetadata.DataBlock> dataBlocks = new ArrayList<>();
-        String[] blockStrs = str.split(";");
-        for (String blockStr : blockStrs) {
-            String[] blockParts = blockStr.split(":");
-            int dataNodeID = Integer.parseInt(blockParts[0]);
-            int blockID = Integer.parseInt(blockParts[1]);
-            dataBlocks.add(new FileMetadata.DataBlock(dataNodeID, blockID));
+        if (!str.equals("")) {
+            String[] blockStrs = str.split(";");
+            for (String blockStr : blockStrs) {
+                String[] blockParts = blockStr.split(":");
+                int dataNodeID = Integer.parseInt(blockParts[0]);
+                int blockID = Integer.parseInt(blockParts[1]);
+                dataBlocks.add(new FileMetadata.DataBlock(dataNodeID, blockID));
+            }
         }
         return dataBlocks;
     }

@@ -56,12 +56,12 @@ public class FileDescTest {
         // 验证 dataBlocks 字段
         List<FileMetadata.DataBlock> dataBlocks = fileDesc.getFileMetadata().getDataBlocks();
         assertEquals(3, dataBlocks.size());
-        assertEquals(1, dataBlocks.get(0).getDataNodeId());
-        assertEquals(100, dataBlocks.get(0).getBlockId());
-        assertEquals(2, dataBlocks.get(1).getDataNodeId());
-        assertEquals(200, dataBlocks.get(1).getBlockId());
-        assertEquals(3, dataBlocks.get(2).getDataNodeId());
-        assertEquals(300, dataBlocks.get(2).getBlockId());
+        assertEquals(1, dataBlocks.get(0).getDataNodeID());
+        assertEquals(100, dataBlocks.get(0).getBlockID());
+        assertEquals(2, dataBlocks.get(1).getDataNodeID());
+        assertEquals(200, dataBlocks.get(1).getBlockID());
+        assertEquals(3, dataBlocks.get(2).getDataNodeID());
+        assertEquals(300, dataBlocks.get(2).getBlockID());
 
         // 验证日期字段
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
