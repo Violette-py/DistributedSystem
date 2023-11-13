@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 //import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 /* XML映射类：文件的元数据信息 */
@@ -15,7 +16,7 @@ public class FileMetadata {
     @XmlElement(name = "fileSize")
     private long fileSize;    // 文件大小
     @XmlElement(name = "dataBlocks")
-    private List<DataBlock> dataBlocks;  // 文件块所在位置（哪个DataNode上的哪个block）
+    private List<DataBlock> dataBlocks;  // 文件块所在位置（哪个DataNode上的哪个 block）
 
     // FIXME: 把时间改成 String类的，存储在 FsImage中会好看一点？
     @XmlElement(name = "createTime")
@@ -69,6 +70,14 @@ public class FileMetadata {
 
     public void setDataBlocks(List<DataBlock> dataBlocks) {
         this.dataBlocks = dataBlocks;
+    }
+
+    public void addDataBlock(int dataNodeID, int blockID) {
+        if (dataBlocks == null) {
+            dataBlocks = new ArrayList<>();
+        }
+        DataBlock dataBlock = new DataBlock(dataNodeID, blockID);
+        dataBlocks.add(dataBlock);
     }
 
     public String getCreateTime() {

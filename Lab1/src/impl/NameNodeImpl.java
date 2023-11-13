@@ -56,8 +56,9 @@ public class NameNodeImpl extends NameNodePOA {
                         // 文件正在被写入，不允许其他客户端以写模式打开
                         return null;
                     } else {
+                        long fileId = counter++;
                         // 内存中有新建的但还未被持久化记录元数据信息的文件，这样直接赋值 metadata可以让新的客户端能读到最新写入的数据
-                        FileDesc fileDesc = new FileDesc(counter++, mode, existingFile.getFileMetadata());
+                        FileDesc fileDesc = new FileDesc(fileId, mode, existingFile.getFileMetadata());
                         fileDesc.getFileMetadata().setAccessTime(getCurrentTime());  // 具体的 modifyTime 是在 append中修改的
                         openFiles.add(fileDesc);
                         return existingFile.toString();
@@ -113,8 +114,20 @@ public class NameNodeImpl extends NameNodePOA {
             throw new RuntimeException(e);
         }
 
+        // FIXME: 在手动测试的时候检查一下这里，单元测试因为速度太快而没有更新？
+//        System.out.println("before delete FileDesc from memory, openFiles.size() : " + openFiles.size());
+//        for (FileDesc existingFile: openFiles) {
+//            System.out.println(existingFile.getFileMetadata().getFilepath());
+//        }
+
         // 把内存中该 open请求的信息删掉
         openFiles.removeIf(value -> value.getId() == fileDesc.getId());
+
+//        System.out.println("After delete FileDesc from memory, openFiles.size() : " + openFiles.size());
+//        for (FileDesc existingFile: openFiles) {
+//            System.out.println(existingFile.getFileMetadata().getFilepath());
+//        }
+
     }
 
     /* 更新文件元数据信息 */

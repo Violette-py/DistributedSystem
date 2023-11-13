@@ -5,7 +5,7 @@ package api;
 * api/_DataNodeStub.java .
 * 由IDL-to-Java 编译器 (可移植), 版本 "3.2"生成
 * 从api.idl
-* 2023年11月13日 星期一 下午08时44分33秒 CST
+* 2023年11月14日 星期二 上午12时28分14秒 CST
 */
 
 public class _DataNodeStub extends org.omg.CORBA.portable.ObjectImpl implements api.DataNode
@@ -31,7 +31,7 @@ public class _DataNodeStub extends org.omg.CORBA.portable.ObjectImpl implements 
             }
   } // read
 
-  public void append (int block_id, byte[] bytes)
+  public int append (int block_id, byte[] bytes)
   {
             org.omg.CORBA.portable.InputStream $in = null;
             try {
@@ -39,13 +39,14 @@ public class _DataNodeStub extends org.omg.CORBA.portable.ObjectImpl implements 
                 $out.write_long (block_id);
                 api.byteArrayHelper.write ($out, bytes);
                 $in = _invoke ($out);
-                return;
+                int $result = $in.read_long ();
+                return $result;
             } catch (org.omg.CORBA.portable.ApplicationException $ex) {
                 $in = $ex.getInputStream ();
                 String _id = $ex.getId ();
                 throw new org.omg.CORBA.MARSHAL (_id);
             } catch (org.omg.CORBA.portable.RemarshalException $rm) {
-                append (block_id, bytes        );
+                return append (block_id, bytes        );
             } finally {
                 _releaseReply ($in);
             }

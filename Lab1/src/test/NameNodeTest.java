@@ -36,7 +36,7 @@ public class NameNodeTest {
         close(fileInfo);
     }
 
-    //    @Test
+        @Test
     /* open an existing file */
     public void testOpen() {
         String filename = FileSystem.newFilename();
@@ -47,7 +47,7 @@ public class NameNodeTest {
         close(fileInfo, fileInfo2);
     }
 
-    //    @Test
+        @Test
     /* open an existing and being written file in writing mode */
     public void testOpenWrite() {
         String filename = FileSystem.newFilename();
@@ -65,6 +65,9 @@ public class NameNodeTest {
         FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));
         FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b01));
         FileDesc fileInfo3 = FileDesc.fromString(nn.open(filename, 0b01));
+//        System.out.println("fileInfo : " + fileInfo.toString());
+//        System.out.println("fileInfo2 : " + fileInfo2.toString());
+//        System.out.println("fileInfo3 : " + fileInfo3.toString());
         assertNotNull(fileInfo);
         assertNotNull(fileInfo2);
         assertNotNull(fileInfo3);

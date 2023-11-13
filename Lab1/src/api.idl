@@ -4,7 +4,7 @@ module api {
 
     interface DataNode {
         byteArray read(in long block_id);
-        void append(in long block_id, in byteArray bytes);
+        long append(in long block_id, in byteArray bytes);
         long randomBlockId();
     };
     interface NameNode{
