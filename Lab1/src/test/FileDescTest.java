@@ -30,8 +30,9 @@ public class FileDescTest {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2023, Calendar.NOVEMBER, 13, 12, 0, 0); // 设置日期时间为 2023-11-13 12:00:00
         Date createTime = calendar.getTime();
+        String time = dateFormat.format(createTime);
 
-        FileMetadata fileMetadata = new FileMetadata("testFile.txt", 1024, dataBlocks, createTime, createTime, createTime);
+        FileMetadata fileMetadata = new FileMetadata("testFile.txt", 1024, dataBlocks, time, time, time);
         FileDesc fileDesc = new FileDesc(123, 1, fileMetadata);
 
         // 调用 toString 方法并验证输出
@@ -65,9 +66,9 @@ public class FileDescTest {
 
         // 验证日期字段
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        assertEquals("2023-11-13 12:00:00", dateFormat.format(fileDesc.getFileMetadata().getCreateTime()));
-        assertEquals("2023-11-13 12:00:00", dateFormat.format(fileDesc.getFileMetadata().getModifyTime()));
-        assertEquals("2023-11-13 12:00:00", dateFormat.format(fileDesc.getFileMetadata().getAccessTime()));
+        assertEquals("2023-11-13 12:00:00", fileDesc.getFileMetadata().getCreateTime());
+        assertEquals("2023-11-13 12:00:00", fileDesc.getFileMetadata().getModifyTime());
+        assertEquals("2023-11-13 12:00:00", fileDesc.getFileMetadata().getAccessTime());
     }
 
 }

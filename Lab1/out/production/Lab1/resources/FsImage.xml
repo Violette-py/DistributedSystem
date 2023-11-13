@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <FsImage>
     <fileMetadata>
-        <filepath>/path/to/file1.txt</filepath>
+        <filepath>file1.txt</filepath>
         <fileSize>1024</fileSize>
         <dataBlocks>
             <dataNodeID>0</dataNodeID>
             <blockID>0</blockID>
         </dataBlocks>
-        <createTime>2023-11-15T10:30:00+08:00</createTime>
-        <modifyTime>2023-11-15T12:45:00+08:00</modifyTime>
-        <accessTime>2023-11-15T15:20:00+08:00</accessTime>
+        <createTime>2023-11-11 21:06:02</createTime>
+        <modifyTime>2023-11-11 21:06:02</modifyTime>
+        <accessTime>2023-11-11 21:06:02</accessTime>
     </fileMetadata>
     <fileMetadata>
-        <filepath>/path/to/file2.txt</filepath>
+        <filepath>file2.txt</filepath>
         <fileSize>2048</fileSize>
         <dataBlocks>
             <dataNodeID>0</dataNodeID>
             <blockID>0</blockID>
         </dataBlocks>
-        <createTime>2023-11-16T09:15:00+08:00</createTime>
-        <modifyTime>2023-11-16T11:30:00+08:00</modifyTime>
-        <accessTime>2023-11-16T14:05:00+08:00</accessTime>
+        <createTime>2023-11-12 21:06:02</createTime>
+        <modifyTime>2023-11-12 21:06:02</modifyTime>
+        <accessTime>2023-11-12 21:06:02</accessTime>
     </fileMetadata>
-<!--    <fileMetadata>-->
-<!--        <filepath>911208664TEST</filepath>-->
-<!--        <fileSize>0</fileSize>-->
-<!--        <createTime>2023-11-13T20:47:46+08:00</createTime>-->
-<!--        <modifyTime>2023-11-13T20:47:46+08:00</modifyTime>-->
-<!--        <accessTime>2023-11-13T20:47:46+08:00</accessTime>-->
-<!--    </fileMetadata>-->
+    <fileMetadata>
+        <filepath>173694175TEST</filepath>
+        <fileSize>0</fileSize>
+        <createTime>2023-11-13 21:06:02</createTime>
+        <modifyTime>2023-11-13 21:06:02</modifyTime>
+        <accessTime>2023-11-13 21:06:02</accessTime>
+    </fileMetadata>
 </FsImage>

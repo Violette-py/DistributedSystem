@@ -58,7 +58,7 @@ public class NameNodeImpl extends NameNodePOA {
                     } else {
                         // 内存中有新建的但还未被持久化记录元数据信息的文件，这样直接赋值 metadata可以让新的客户端能读到最新写入的数据
                         FileDesc fileDesc = new FileDesc(counter++, mode, existingFile.getFileMetadata());
-                        fileDesc.getFileMetadata().setAccessTime(new Date());  // 具体的 modifyTime 是在 append中修改的
+                        fileDesc.getFileMetadata().setAccessTime(getCurrentTime());  // 具体的 modifyTime 是在 append中修改的
                         openFiles.add(fileDesc);
                         return existingFile.toString();
                     }
@@ -158,7 +158,7 @@ public class NameNodeImpl extends NameNodePOA {
     /* 路径指向不存在文件时，新建文件 */
     // 这里的创建实际上是在内存中暂时创建，还未持久化到 FsImage
     private FileMetadata createNewFile(String filepath) {
-        Date time = new Date();
+        String time = getCurrentTime();
         return new FileMetadata(filepath, 0, new ArrayList<>(), time, time, time); // 新建文件时，尚未分配 block
     }
 
@@ -184,5 +184,12 @@ public class NameNodeImpl extends NameNodePOA {
     private boolean isWriteMode(int mode) {
         // 判断高位是否为 1
         return (mode & 0b10) != 0;
+    }
+
+    /* 获取当前时间 */
+    public static String getCurrentTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 }

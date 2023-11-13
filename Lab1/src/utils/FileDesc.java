@@ -41,9 +41,9 @@ public class FileDesc {
         builder.append(fileMetadata.getFilepath()).append(",");
         builder.append(fileMetadata.getFileSize()).append(",");
         builder.append(dataBlocksToString(fileMetadata.getDataBlocks())).append(",");
-        builder.append(dateToString(fileMetadata.getCreateTime())).append(",");
-        builder.append(dateToString(fileMetadata.getModifyTime())).append(",");
-        builder.append(dateToString(fileMetadata.getAccessTime())).append(",");
+        builder.append(fileMetadata.getCreateTime()).append(",");
+        builder.append(fileMetadata.getModifyTime()).append(",");
+        builder.append(fileMetadata.getAccessTime()).append(",");
         return builder.toString();
     }
 
@@ -64,9 +64,9 @@ public class FileDesc {
 //        System.out.println("parts[5] : " + parts[5]);
 //        System.out.println("if parts[4] is null : " + (Objects.equals(parts[4], "")));
         List<FileMetadata.DataBlock> dataBlocks = stringToDataBlocks(parts[4]);
-        Date createTime = stringToDate(parts[5]);
-        Date modifyTime = stringToDate(parts[6]);
-        Date accessTime = stringToDate(parts[7]);
+        String createTime = parts[5];
+        String modifyTime = parts[6];
+        String accessTime = parts[7];
         FileMetadata fileMetadata = new FileMetadata(filepath, fileSize, dataBlocks, createTime, modifyTime, accessTime);
         return new FileDesc(id, mode, fileMetadata);
     }
@@ -95,22 +95,22 @@ public class FileDesc {
         return dataBlocks;
     }
 
-    // 辅助方法：将 Date 转换为字符串
-    private static String dateToString(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(date);
-    }
-
-    // 辅助方法：将字符串转换为 Date
-    private static Date stringToDate(String str) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return dateFormat.parse(str);
-        } catch (Exception e) {
-            // 处理异常
-            return null;
-        }
-    }
+//    // 辅助方法：将 Date 转换为字符串
+//    private static String dateToString(Date date) {
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        return dateFormat.format(date);
+//    }
+//
+//    // 辅助方法：将字符串转换为 Date
+//    private static Date stringToDate(String str) {
+//        try {
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            return dateFormat.parse(str);
+//        } catch (Exception e) {
+//            // 处理异常
+//            return null;
+//        }
+//    }
 
     // Getters
     public long getId() {

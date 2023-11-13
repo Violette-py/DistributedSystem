@@ -3,7 +3,7 @@ package utils;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.Date;
+//import java.util.Date;
 import java.util.List;
 
 /* XML映射类：文件的元数据信息 */
@@ -16,12 +16,14 @@ public class FileMetadata {
     private long fileSize;    // 文件大小
     @XmlElement(name = "dataBlocks")
     private List<DataBlock> dataBlocks;  // 文件块所在位置（哪个DataNode上的哪个block）
+
+    // FIXME: 把时间改成 String类的，存储在 FsImage中会好看一点？
     @XmlElement(name = "createTime")
-    private Date createTime; // 创建时间 -- 只在 NameNode的 createNewFile函数中第一次设置
+    private String createTime; // 创建时间 -- 只在 NameNode的 createNewFile函数中第一次设置
     @XmlElement(name = "modifyTime")
-    private Date modifyTime; // 修改时间 -- append操作完成后
+    private String modifyTime; // 修改时间 -- append操作完成后
     @XmlElement(name = "accessTime")
-    private Date accessTime; // 访问时间 -- 每一次 open请求时
+    private String accessTime; // 访问时间 -- 每一次 open请求时
     // 以上时间都是最近一次的时间
 
     public FileMetadata() {
@@ -34,7 +36,7 @@ public class FileMetadata {
         this.dataBlocks = dataBlocks;
     }
 
-    public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks, Date createTime, Date modifyTime, Date accessTime) {
+    public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks, String createTime, String modifyTime, String accessTime) {
         this.filepath = filepath;
         this.fileSize = fileSize;
         this.dataBlocks = dataBlocks;
@@ -69,27 +71,27 @@ public class FileMetadata {
         this.dataBlocks = dataBlocks;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public Date getModifyTime() {
+    public String getModifyTime() {
         return modifyTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
+    public void setModifyTime(String modifyTime) {
         this.modifyTime = modifyTime;
     }
 
-    public Date getAccessTime() {
+    public String getAccessTime() {
         return accessTime;
     }
 
-    public void setAccessTime(Date accessTime) {
+    public void setAccessTime(String accessTime) {
         this.accessTime = accessTime;
     }
 
