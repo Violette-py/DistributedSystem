@@ -35,10 +35,13 @@ public class NameNodeImpl extends NameNodePOA {
     @Override
     public String open(String filepath, int mode) {
 
+        System.out.println("---- NameNode / open ----");
+
         // 注意：openFiles的实时更新 -- 每次 new FileDesc都要加入 List
 
         // 首先检查 FsImage中是否有该文件
         FileMetadata fileMetadata = findFileInDisk(filepath);
+        System.out.println("after find file in disk");
 
         // 若文件不存在于磁盘中
         if (fileMetadata == null) {
@@ -53,7 +56,7 @@ public class NameNodeImpl extends NameNodePOA {
                         // 文件正在被写入，不允许其他客户端以写模式打开
                         return null;
                     } else {
-                        // 内存中有新建的但还未被持久化记录元数据信息的文件
+                        // 内存中有新建的但还未被持久化记录元数据信息的文件，这样直接赋值 metadata可以让新的客户端能读到最新写入的数据
                         FileDesc fileDesc = new FileDesc(counter++, mode, existingFile.getFileMetadata());
                         fileDesc.getFileMetadata().setAccessTime(new Date());  // 具体的 modifyTime 是在 append中修改的
                         openFiles.add(fileDesc);
@@ -65,7 +68,6 @@ public class NameNodeImpl extends NameNodePOA {
             System.out.println("so now create it ...");
             // 磁盘和内存中均没有对应文件，则新建
             fileMetadata = createNewFile(filepath);
-//            System.out.println("new created file : " + fileMetadata);
         }
 
         // 生成新的文件描述符（FileDesc）
@@ -81,9 +83,48 @@ public class NameNodeImpl extends NameNodePOA {
     /* 关闭文件，同时将文件的元数据信息（而非文件数据本身）更新持久化到硬盘中 */
     @Override
     public void close(String fileInfo) {
+
+        // 加载当前的 FsImage
+        FsImage fsImage = loadFsImage();
+        List<FileMetadata> existingFiles = fsImage.getFiles();
+
         FileDesc fileDesc = FileDesc.fromString(fileInfo);
+        FileMetadata newFileMetadata = fileDesc.getFileMetadata();
+
+        // 更新持久化到 FsImage中：若已存在该文件（路径一致），则更新其余信息；若不存在，则新增
+        boolean fileExists = false;
+        for (FileMetadata existingFile : existingFiles) {
+            if (existingFile.getFilepath().equals(newFileMetadata.getFilepath())) {
+                updateFileMetadata(existingFile, newFileMetadata);
+                fileExists = true;
+                break;
+            }
+        }
+
+        // 如果不存在相同路径的文件元数据，添加新的文件数据信息
+        if (!fileExists) {
+            existingFiles.add(newFileMetadata);
+        }
+
+        File xmlFile = new File("src/resources/FsImage.xml"); // TODO: 提取成常量
+        try {
+            FsImageXmlHandler.marshal(fsImage, xmlFile);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 把内存中该 open请求的信息删掉
         openFiles.removeIf(value -> value.getId() == fileDesc.getId());
-        // 更新持久化到 FsImage中
+    }
+
+    /* 更新文件元数据信息 */
+    private void updateFileMetadata(FileMetadata existingFile, FileMetadata newFile) {
+        // 更新现有文件元数据的其他信息
+        existingFile.setFileSize(newFile.getFileSize());
+        existingFile.setDataBlocks(newFile.getDataBlocks());
+        existingFile.setModifyTime(newFile.getModifyTime());
+        existingFile.setAccessTime(newFile.getAccessTime());
+        // 注意：没更新 createTime hh
     }
 
     /* 在内存中查找文件（可能客户端新建后尚未 close，也就没有持久化到 FsImage中） */

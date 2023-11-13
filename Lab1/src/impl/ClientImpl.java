@@ -21,7 +21,9 @@ public class ClientImpl implements Client {
 
         // 在内存中存储打开的文件信息
         FileDesc fileDesc = FileDesc.fromString(fileInfo);
-        openFiles.put((int) fileDesc.getId(), fileDesc); // 真正的 FileDesc都是在 NameNode中 new出来的，这里存储只是为了让客户端利用该信息直接与 DataNode交互
+        openFiles.put((int) fileDesc.getId(), fileDesc);
+        // 真正的 FileDesc都是在 NameNode中 new出来的，这里存储只是为了让客户端利用该信息直接与 DataNode交互
+        // 但是客户端中的 FileDesc的信息是最新的，因为读写都是客户端直接与 DataNode交互，如果要加块是直接告诉客户端，然后将信息更新在客户端侧的 FileDesc
 
         return (int) fileDesc.getId();
     }
