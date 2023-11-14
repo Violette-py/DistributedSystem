@@ -65,9 +65,6 @@ public class NameNodeTest {
         FileDesc fileInfo = FileDesc.fromString(nn.open(filename, 0b10));
         FileDesc fileInfo2 = FileDesc.fromString(nn.open(filename, 0b01));
         FileDesc fileInfo3 = FileDesc.fromString(nn.open(filename, 0b01));
-//        System.out.println("fileInfo : " + fileInfo.toString());
-//        System.out.println("fileInfo2 : " + fileInfo2.toString());
-//        System.out.println("fileInfo3 : " + fileInfo3.toString());
         assertNotNull(fileInfo);
         assertNotNull(fileInfo2);
         assertNotNull(fileInfo3);

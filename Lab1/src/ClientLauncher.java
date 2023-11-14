@@ -11,10 +11,6 @@ public class ClientLauncher {
     private static final String CMD_CLOSE = "close";
     private static final String CMD_EXIT = "exit";
 
-    //    private static final String INFO_FD = ;
-//    private static final String INFO_READ_NOT_ALLOWED = "";
-    private static final String INFO_FD_CLOSED = "INFO: fd ";
-
     private ClientImpl client;
 
     public ClientLauncher(ClientImpl client) {
@@ -57,7 +53,6 @@ public class ClientLauncher {
                         // 无效的访问权限，可以根据需求进行处理
                         System.out.println("Invalid access mode");
                         printUsage();
-//                        return;
                     }
 
                     int fd = client.open(filename, mode);

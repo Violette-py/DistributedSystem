@@ -58,11 +58,6 @@ public class FileDesc {
         int mode = Integer.parseInt(parts[1]);
         String filepath = parts[2];
         long fileSize = Long.parseLong(parts[3]);
-//        System.out.println("parts[2] : " + parts[2]);
-//        System.out.println("parts[3] : " + parts[3]);
-//        System.out.println("parts[4] : " + parts[4]);
-//        System.out.println("parts[5] : " + parts[5]);
-//        System.out.println("if parts[4] is null : " + (Objects.equals(parts[4], "")));
         List<FileMetadata.DataBlock> dataBlocks = stringToDataBlocks(parts[4]);
         String createTime = parts[5];
         String modifyTime = parts[6];
@@ -97,23 +92,6 @@ public class FileDesc {
         }
         return dataBlocks;
     }
-
-//    // 辅助方法：将 Date 转换为字符串
-//    private static String dateToString(Date date) {
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        return dateFormat.format(date);
-//    }
-//
-//    // 辅助方法：将字符串转换为 Date
-//    private static Date stringToDate(String str) {
-//        try {
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            return dateFormat.parse(str);
-//        } catch (Exception e) {
-//            // 处理异常
-//            return null;
-//        }
-//    }
 
     // Getters
     public long getId() {

@@ -3,7 +3,6 @@ package utils;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-//import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FileMetadata {
     @XmlElement(name = "filepath")
-    private String filepath;
+    private String filepath;  // 文件路径
     @XmlElement(name = "fileSize")
     private long fileSize;    // 文件大小
     @XmlElement(name = "dataBlocks")
@@ -27,13 +26,6 @@ public class FileMetadata {
     // 以上时间都是最近一次的时间
 
     public FileMetadata() {
-    }
-
-    // 时间应该是动态设置的，而非作为参数传入
-    public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks) {
-        this.filepath = filepath;
-        this.fileSize = fileSize;
-        this.dataBlocks = dataBlocks;
     }
 
     public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks, String createTime, String modifyTime, String accessTime) {
@@ -118,7 +110,6 @@ public class FileMetadata {
             this.dataNodeID = dataNodeID;
             this.blockID = blockID;
         }
-
 
         // Getters and setters for data block fields
 

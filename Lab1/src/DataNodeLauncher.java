@@ -2,19 +2,15 @@ import api.DataNode;
 import api.DataNodeHelper;
 import impl.DataNodeImpl;
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
-import utils.Constants;
 
 import java.util.Properties;
 
 public class DataNodeLauncher {
-
-//    private static int counter = 0; // 用于 DataNode id自增，与 Client侧 和 DataNodeImpl内 id自增 都对应
 
     public static void main(String[] args) {
 
@@ -26,7 +22,6 @@ public class DataNodeLauncher {
 
             // 解析命令行参数
             for (int i = 0; i < args.length; i++) {
-//                System.out.println("arg" + i + " : " + args[i]);
                 switch (args[i]) {
                     case "-ORBInitialPort":
                         if (i < args.length - 1) {
@@ -103,14 +98,9 @@ public class DataNodeLauncher {
 
             // bind to Naming
             NameComponent[] path = ncRef.to_name("DataNode" + dataNodeId);
-//            NameComponent[] path = ncRef.to_name("DataNode" + Constants.DATANODE_ID);
-
-            System.out.println("DataNode " + dataNodeId + " is ready and waiting...");
-//            System.out.println("DataNode " + Constants.DATANODE_ID + " is ready and waiting...");
-
-//            Constants.DATANODE_ID++;
             ncRef.rebind(path, href);
 
+            System.out.println("DataNode " + dataNodeId + " is ready and waiting...");
 
             // waiting
             orb.run();

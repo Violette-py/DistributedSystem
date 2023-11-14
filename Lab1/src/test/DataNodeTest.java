@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
+import static utils.UtilFunction.extractNonZeroBytes;
 
 public class DataNodeTest {
     static DataNodeImpl dn;
@@ -31,6 +32,7 @@ public class DataNodeTest {
 
         dn.append(blockId, toWrite);
         byte[] read = dn.read(blockId);
+        read = extractNonZeroBytes(read);  // 需要清洗数据
 
         int n = toWrite.length;
         int N = read.length;
