@@ -49,7 +49,7 @@ public class FileDesc {
 
     /* 按照一定格式从字符串中解析出 FileDesc的信息 */
     public static FileDesc fromString(String str) {
-        if (str == null) {
+        if (str == null || str.trim().isEmpty()) {
             return null;
         }
 
@@ -73,6 +73,9 @@ public class FileDesc {
 
     // 辅助方法：将 List<DataBlock> 转换为字符串
     private static String dataBlocksToString(List<FileMetadata.DataBlock> dataBlocks) {
+        if (dataBlocks == null) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (FileMetadata.DataBlock block : dataBlocks) {
             sb.append(block.getDataNodeID()).append(":").append(block.getBlockID()).append(";");

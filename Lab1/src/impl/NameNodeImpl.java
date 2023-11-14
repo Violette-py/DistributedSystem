@@ -48,27 +48,45 @@ public class NameNodeImpl extends NameNodePOA {
 
             System.out.println("file is not in disk");
 
-            // 查找内存中是否有该文件（其他客户端创建但还未持久化到 FsImage中）
+            // 查找内存中是否有该文件（其他客户端创建但还未持久化到 FsImage中）,首先检查权限是否兼容
+            FileDesc sameFile = null;
             for (FileDesc existingFile : openFiles) {
                 if (existingFile.getFileMetadata().getFilepath().equals(filepath)) {
-                    System.out.println("file is created but still not stored in FsImage");
+                    sameFile = existingFile;
                     if (isWriteMode(mode) && isWriteMode(existingFile.getMode())) {
                         // 文件正在被写入，不允许其他客户端以写模式打开
-                        return null;
-                    } else {
-                        long fileId = counter++;
-                        // 内存中有新建的但还未被持久化记录元数据信息的文件，这样直接赋值 metadata可以让新的客户端能读到最新写入的数据
-                        FileDesc fileDesc = new FileDesc(fileId, mode, existingFile.getFileMetadata());
-                        fileDesc.getFileMetadata().setAccessTime(getCurrentTime());  // 具体的 modifyTime 是在 append中修改的
-                        openFiles.add(fileDesc);
-                        return existingFile.toString();
+                        return "";
+//                        return null;
                     }
                 }
             }
+
+            if (sameFile != null) {
+
+                System.out.println("file is created but still not stored in FsImage");
+
+                // 内存中有新建的但还未被持久化记录元数据信息的文件，这样直接赋值 metadata可以让新的客户端能读到最新写入的数据
+                FileDesc fileDesc = new FileDesc(counter++, mode, sameFile.getFileMetadata());
+                fileDesc.getFileMetadata().setAccessTime(getCurrentTime());  // 具体的 modifyTime 是在 append中修改的
+                openFiles.add(fileDesc);
+                return fileDesc.toString();
+
+            }
+
             System.out.println("file is not in memory");
             System.out.println("so now create it ...");
             // 磁盘和内存中均没有对应文件，则新建
             fileMetadata = createNewFile(filepath);
+        } else {
+            // 文件存在磁盘中，需要检查当前的操作模式是否兼容
+            for (FileDesc existingFile : openFiles) {
+                if (existingFile.getFileMetadata().getFilepath().equals(filepath)) {
+                    if (isWriteMode(mode) && isWriteMode(existingFile.getMode())) {
+                        // 文件正在被写入，不允许其他客户端以写模式打开
+                        return null;
+                    }
+                }
+            }
         }
 
         // 生成新的文件描述符（FileDesc）
@@ -122,11 +140,6 @@ public class NameNodeImpl extends NameNodePOA {
 
         // 把内存中该 open请求的信息删掉
         openFiles.removeIf(value -> value.getId() == fileDesc.getId());
-
-//        System.out.println("After delete FileDesc from memory, openFiles.size() : " + openFiles.size());
-//        for (FileDesc existingFile: openFiles) {
-//            System.out.println(existingFile.getFileMetadata().getFilepath());
-//        }
 
     }
 

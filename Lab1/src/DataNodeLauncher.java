@@ -6,13 +6,8 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
-import org.omg.CosNaming.NamingContextPackage.CannotProceed;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
-import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
-import org.omg.PortableServer.POAPackage.ServantNotActive;
-import org.omg.PortableServer.POAPackage.WrongPolicy;
 import utils.Constants;
 
 import java.util.Properties;
@@ -24,6 +19,64 @@ public class DataNodeLauncher {
     public static void main(String[] args) {
 
         try {
+
+            int orbInitialPort = -1;
+            String orbInitialHost = null;
+            int dataNodeId = -1;
+
+            // 解析命令行参数
+            for (int i = 0; i < args.length; i++) {
+//                System.out.println("arg" + i + " : " + args[i]);
+                switch (args[i]) {
+                    case "-ORBInitialPort":
+                        if (i < args.length - 1) {
+                            orbInitialPort = Integer.parseInt(args[i + 1]);
+                            i++; // 跳过下一个参数
+                        } else {
+                            // 处理缺少参数的情况
+                            System.err.println("-ORBInitialPort 需要指定端口号");
+                            return;
+                        }
+                        break;
+                    case "-ORBInitialHost":
+                        if (i < args.length - 1) {
+                            orbInitialHost = args[i + 1];
+                            i++; // 跳过下一个参数
+                        } else {
+                            // 处理缺少参数的情况
+                            System.err.println("-ORBInitialHost 需要指定主机名");
+                            return;
+                        }
+                        break;
+                    case "-DataNodeID":
+                        if (i < args.length - 1) {
+                            dataNodeId = Integer.parseInt(args[i + 1]);
+                            i++; // 跳过下一个参数
+                        } else {
+                            // 处理缺少参数的情况
+                            System.err.println("-DataNodeID 需要指定DataNode ID");
+                            return;
+                        }
+                        break;
+                    default:
+                        // 处理未知参数
+                        System.err.println("未知参数: " + args[i]);
+                        return;
+                }
+            }
+
+            // 检查必需参数
+            if (orbInitialPort == -1 || orbInitialHost == null || dataNodeId == -1) {
+                System.err.println("缺少必要的参数");
+                return;
+            }
+
+            // 打印参数值，可以根据需要将这些参数传递给 DataNode 的启动逻辑
+            System.out.println("ORBInitialPort: " + orbInitialPort);
+            System.out.println("ORBInitialHost: " + orbInitialHost);
+            System.out.println("dataNodeID: " + dataNodeId);
+
+            /* ------------------------------------------------------------------------ */
 
             Properties properties = new Properties();
             properties.put("org.omg.CORBA.ORBInitialHost", "127.0.0.1");  // ORB IP
@@ -37,7 +90,8 @@ public class DataNodeLauncher {
             rootpoa.the_POAManager().activate();
 
             // new a object
-            DataNodeImpl dataNodeServant = new DataNodeImpl();
+            DataNodeImpl dataNodeServant = new DataNodeImpl(dataNodeId);
+//            DataNodeImpl dataNodeServant = new DataNodeImpl();
 
             // export
             org.omg.CORBA.Object ref = rootpoa.servant_to_reference(dataNodeServant);
@@ -48,11 +102,15 @@ public class DataNodeLauncher {
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
             // bind to Naming
-            NameComponent[] path = ncRef.to_name("DataNode" + Constants.DATANODE_ID);
-            Constants.DATANODE_ID++;
+            NameComponent[] path = ncRef.to_name("DataNode" + dataNodeId);
+//            NameComponent[] path = ncRef.to_name("DataNode" + Constants.DATANODE_ID);
+
+            System.out.println("DataNode " + dataNodeId + " is ready and waiting...");
+//            System.out.println("DataNode " + Constants.DATANODE_ID + " is ready and waiting...");
+
+//            Constants.DATANODE_ID++;
             ncRef.rebind(path, href);
 
-            System.out.println("DataNode is ready and waiting...");
 
             // waiting
             orb.run();

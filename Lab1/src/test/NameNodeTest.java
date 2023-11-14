@@ -27,7 +27,7 @@ public class NameNodeTest {
      * x - write
      * y - read */
 
-    //    @Test
+        @Test
     /* open a non-exist file */
     public void testCreate() {
         String filename = FileSystem.newFilename();

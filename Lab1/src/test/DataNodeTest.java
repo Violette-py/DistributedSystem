@@ -14,7 +14,8 @@ public class DataNodeTest {
 
     @Before
     public void setUp() {
-        dn = new DataNodeImpl();
+        dn = new DataNodeImpl(0);
+//        dn = new DataNodeImpl();
     }
 
     @Test

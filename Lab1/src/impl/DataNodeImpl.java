@@ -14,17 +14,17 @@ public class DataNodeImpl extends DataNodePOA {
     private final int BLOCK_SIZE = 4 * 1024;
     private final String BASE_DATA_DIRECTORY = "src/resources";
     private final String dataDirectory;
-    private static int counter = 0;
+    //    private static int counter = 0;
     //    private static int dataNodeID = 1;
     private int dataNodeID;
     private List<Integer> blockIDList;  // 每个 block都对应一个 .txt文件
     // 不需要在内存里记录 blockId -> byte 的映射，因为直接跟硬盘交互，只需要记录 blockid的列表即可
 //    private final Map<Integer, String> blockToFileMap;
 
-    private final Random random;
+//    private final Random random;
 
-    public DataNodeImpl() {
-        this.dataNodeID = counter++;
+    public DataNodeImpl(int dataNodeID) {
+        this.dataNodeID = dataNodeID;
         this.blockIDList = new ArrayList<>();
 
         // 为每个 DataNode维护一个文件目录，用于存储数据文件 eg. dataNode1从 src/resources/datanode_1 下读取数据
@@ -33,7 +33,7 @@ public class DataNodeImpl extends DataNodePOA {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        this.random = new Random();
+//        this.random = new Random();
     }
 
     /* 读取某个数据块的所有数据 */
@@ -46,7 +46,20 @@ public class DataNodeImpl extends DataNodePOA {
         try {
             // 读取文件内容并返回
             Path path = Paths.get(filePath);
-            return Files.readAllBytes(path);
+            byte[] blockBytes = Files.readAllBytes(path);
+
+            System.out.println("before blockBytes size = " + blockBytes);
+
+            // 补齐数据
+            if (blockBytes.length < this.BLOCK_SIZE) {
+                byte[] paddedBytes = new byte[this.BLOCK_SIZE];
+                System.arraycopy(blockBytes, 0, paddedBytes, 0, blockBytes.length);
+                blockBytes = paddedBytes;
+            }
+
+            System.out.println("after blockBytes size = " + blockBytes);
+
+            return blockBytes;
         } catch (NoSuchFileException e) {
             return new byte[0];
         } catch (IOException e) {
@@ -61,13 +74,27 @@ public class DataNodeImpl extends DataNodePOA {
     @Override
     public int append(int block_id, byte[] bytes) {
 
+        System.out.println("DataNode --- append");
+
+        System.out.println("before extract, length : " + bytes.length);
+
+        bytes = extractNonZeroBytes(bytes);
+
+        System.out.println("after extract, length : " + bytes.length);
+
+        boolean isNewBlock = false;
+
         // 如果 block_id 为 -1，说明是一个新文件，则随机分配一个块号
         if (block_id <= 0) {
+            System.out.println("4 ------");
             block_id = randomBlockId();
             createNewBlockFile(block_id);
-        } else if (blockIDList.isEmpty() || blockIDList.contains(block_id)) {
+            isNewBlock = true;
+        } else if (blockIDList.isEmpty() || !blockIDList.contains(block_id)) {
+            System.out.println("4 ------");
             // 如果对应的 block还不存在，则要创建（看测试代码）
             createNewBlockFile(block_id);
+            isNewBlock = true;
         }
 
         String filePath = this.dataDirectory + File.separator + "block_" + block_id + ".txt";
@@ -82,7 +109,13 @@ public class DataNodeImpl extends DataNodePOA {
             if (remainingSpace >= bytes.length) {
                 // 如果当前块的空间足够，直接写入
                 fos.write(bytes);
-                return -1;
+                if (isNewBlock) {
+                    System.out.println("5 ------");
+                    return block_id;
+                } else {
+                    System.out.println("6 ------");
+                    return -1;
+                }
             } else {
                 // 将部分数据写入当前块
                 fos.write(bytes, 0, (int) remainingSpace);
@@ -131,6 +164,20 @@ public class DataNodeImpl extends DataNodePOA {
             e.printStackTrace();
             return false;  // 返回-1表示创建失败
         }
+    }
+
+    public static byte[] extractNonZeroBytes(byte[] bytes) {
+        int lastIndex;
+        for (lastIndex = bytes.length - 1; lastIndex >= 0; lastIndex--) {
+            if (bytes[lastIndex] != 0) {
+                break;
+            }
+        }
+
+        if (lastIndex == -1) {
+            return new byte[0];
+        }
+        return Arrays.copyOf(bytes, lastIndex + 1);
     }
 
 }

@@ -11,9 +11,8 @@ public class ClientLauncher {
     private static final String CMD_CLOSE = "close";
     private static final String CMD_EXIT = "exit";
 
-    private static final String INFO_FD = "INFO: fd=";
-    private static final String INFO_READ_NOT_ALLOWED = "INFO: READ not allowed";
-    private static final String INFO_WRITE_DONE = "INFO: write done";
+    //    private static final String INFO_FD = ;
+//    private static final String INFO_READ_NOT_ALLOWED = "";
     private static final String INFO_FD_CLOSED = "INFO: fd ";
 
     private ClientImpl client;
@@ -44,8 +43,29 @@ public class ClientLauncher {
             case CMD_OPEN:
                 if (tokens.length >= 3) {
                     String filename = tokens[1];
-                    int mode = Integer.parseInt(tokens[2]);
-                    client.open(filename, mode);
+                    String access = tokens[2];
+                    int mode = 0;  // 默认为 0
+
+                    // 设置访问权限
+                    if (access.equals("w")) {
+                        mode |= 0b10;
+                    } else if (access.equals("r")) {
+                        mode |= 0b01;
+                    } else if (access.equals("wr") || access.equals("rw")) {
+                        mode |= 0b11;
+                    } else {
+                        // 无效的访问权限，可以根据需求进行处理
+                        System.out.println("Invalid access mode");
+                        printUsage();
+//                        return;
+                    }
+
+                    int fd = client.open(filename, mode);
+                    if (fd == -1) {
+                        System.out.println("INFO: cannot write the same file simultaneously");
+                    } else {
+                        System.out.println("INFO: fd=" + fd);
+                    }
                 } else {
                     printUsage();
                 }
@@ -54,7 +74,23 @@ public class ClientLauncher {
             case CMD_READ:
                 if (tokens.length >= 2) {
                     int fd = Integer.parseInt(tokens[1]);
-                    client.read(fd);
+
+                    // 从客户端读取数据
+                    byte[] data = client.read(fd);
+
+                    // 检查返回值并输出相应信息
+                    if (data == null) {
+                        // 没有读权限
+                        System.out.println("INFO: READ not allowed");
+                    } else if (data.length == 0) {
+                        // 文件为空
+                        System.out.println("INFO: file is empty");
+                    } else {
+                        // 输出文件内容
+                        String content = new String(data, StandardCharsets.UTF_8);
+                        System.out.println(content);
+                    }
+
                 } else {
                     printUsage();
                 }
@@ -64,7 +100,12 @@ public class ClientLauncher {
                 if (tokens.length >= 3) {
                     int fd = Integer.parseInt(tokens[1]);
                     String content = input.substring(input.indexOf(tokens[2]));
-                    client.append(fd, content.getBytes(StandardCharsets.UTF_8));
+                    int result = client.append(fd, content.getBytes(StandardCharsets.UTF_8));
+                    if (result == -1) {
+                        System.out.println("INFO: WRITE not allowed");
+                    } else {
+                        System.out.println("INFO: write done");
+                    }
                 } else {
                     printUsage();
                 }
@@ -74,6 +115,7 @@ public class ClientLauncher {
                 if (tokens.length >= 2) {
                     int fd = Integer.parseInt(tokens[1]);
                     client.close(fd);
+                    System.out.println("INFO: fd " + fd + " closed");
                 } else {
                     printUsage();
                 }
@@ -99,7 +141,6 @@ public class ClientLauncher {
     }
 
     public static void main(String[] args) {
-        // Assuming you have a ClientImpl instance
         ClientImpl clientImpl = new ClientImpl();
         ClientLauncher clientLauncher = new ClientLauncher(clientImpl);
         clientLauncher.start();

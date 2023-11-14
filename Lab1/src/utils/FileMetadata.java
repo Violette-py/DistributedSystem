@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* XML映射类：文件的元数据信息 */
-//@XmlElement(name = "file")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FileMetadata {
     @XmlElement(name = "filepath")
