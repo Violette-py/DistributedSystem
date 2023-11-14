@@ -8,7 +8,7 @@ import java.io.File;
 
 public class FsImageXmlHandler {
 
-    /* å°† FsImageå¯¹è±¡å†™å…¥xmlæ–‡ä»¶ */
+    /* ½« FsImage¶ÔÏóĞ´ÈëxmlÎÄ¼ş */
     public static void marshal(FsImage fsImage, File xmlFile) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(FsImage.class);
         Marshaller marshaller = context.createMarshaller();
@@ -16,7 +16,7 @@ public class FsImageXmlHandler {
         marshaller.marshal(fsImage, xmlFile);
     }
 
-    /* ä» xmlæ–‡ä»¶ä¸­è¯»å– FsImageå¯¹è±¡ */
+    /* ´Ó xmlÎÄ¼şÖĞ¶ÁÈ¡ FsImage¶ÔÏó */
     public static FsImage unmarshal(File xmlFile) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(FsImage.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();

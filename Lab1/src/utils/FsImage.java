@@ -7,8 +7,8 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FsImage {
 
-    // TODO: è¿˜éœ€è¦ç»´æŠ¤ä¸€ä¸ªæ–‡ä»¶ç›®å½•ç»“æ„ï¼Œä¾¿äºå¿«é€ŸæŸ¥æ‰¾å®¢æˆ·ç«¯è¯·æ±‚çš„æ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼ˆä¸å­˜åœ¨åˆ™æ–°å»ºï¼‰ -- æ˜¯å¦éœ€è¦ï¼Ÿ
-//    @XmlElementWrapper(name = "files") // ä½¿ç”¨ @XmlElementWrapper åŒ…è£…åˆ—è¡¨
+    // TODO: »¹ĞèÒªÎ¬»¤Ò»¸öÎÄ¼şÄ¿Â¼½á¹¹£¬±ãÓÚ¿ìËÙ²éÕÒ¿Í»§¶ËÇëÇóµÄÎÄ¼şÊÇ·ñ´æÔÚ£¨²»´æÔÚÔòĞÂ½¨£© -- ÊÇ·ñĞèÒª£¿
+//    @XmlElementWrapper(name = "files") // Ê¹ÓÃ @XmlElementWrapper °ü×°ÁĞ±í
     @XmlElement(name = "fileMetadata")
     private List<FileMetadata> files;
 

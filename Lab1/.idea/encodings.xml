@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/ClientLauncher.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/DataNodeLauncher.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/NameNodeLauncher.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/api/DataNode.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/api/DataNodeHelper.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/api/DataNodeOperations.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/api/DataNodePOA.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/api/NameNode.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/impl/ClientImpl.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/impl/DataNodeImpl.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/impl/NameNodeImpl.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/test/ClientTest.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/test/DataNodeTest.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/utils/Constants.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/utils/FileDesc.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/utils/FileMetadata.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/utils/FsImage.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/utils/FsImageXmlHandler.java" charset="GBK" />
     <file url="PROJECT" charset="GBK" />
   </component>
 </project>

@@ -18,9 +18,9 @@ public class FileDesc {
      * client2 tries again and get a new FileDesc with a new id 0x88a
      */
 
-    /* ä¸Šé¢è¿™ä¸ªä¾‹å­å·²ç»è¯´æ˜äº†ï¼Œç›¸åŒçš„æ–‡ä»¶è¢«è¿”å›äº†ä¸åŒçš„ idï¼Œé‚£ä¹ˆå°±å¯ä»¥æŠŠè¿™é‡Œçš„ idç†è§£æˆ fd */
-    private final long id;   // æ–‡ä»¶ fd ï¼ˆæ¯ä¸ªåˆæ³•çš„ openè¯·æ±‚éƒ½ä¼šå”¯ä¸€åˆ†é…ä¸€ä¸ªï¼‰
-    private int mode;       // è¯»å†™æ¨¡å¼
+    /* ÉÏÃæÕâ¸öÀı×ÓÒÑ¾­ËµÃ÷ÁË£¬ÏàÍ¬µÄÎÄ¼ş±»·µ»ØÁË²»Í¬µÄ id£¬ÄÇÃ´¾Í¿ÉÒÔ°ÑÕâÀïµÄ idÀí½â³É fd */
+    private final long id;   // ÎÄ¼ş fd £¨Ã¿¸öºÏ·¨µÄ openÇëÇó¶¼»áÎ¨Ò»·ÖÅäÒ»¸ö£©
+    private int mode;       // ¶ÁĞ´Ä£Ê½
     private FileMetadata fileMetadata;
 
     public FileDesc(long id, int mode, FileMetadata fileMetadata) {
@@ -31,10 +31,10 @@ public class FileDesc {
 
     /* The following method is for conversion, so we can have interface that return string, which is easy to write in idl */
 
-    /* æŠŠ FileDescçš„ä¿¡æ¯ç»„ç»‡æˆå­—ç¬¦ä¸²è¿”å› */
+    /* °Ñ FileDescµÄĞÅÏ¢×éÖ¯³É×Ö·û´®·µ»Ø */
     @Override
     public String toString() {
-        // æ³¨æ„ç»„ç»‡æˆå­—ç¬¦ä¸²çš„æ ¼å¼é¡ºåºï¼Œåé¢åè§£æä¹Ÿè¦æŒ‰ç…§åŒæ ·çš„æ ¼å¼
+        // ×¢Òâ×éÖ¯³É×Ö·û´®µÄ¸ñÊ½Ë³Ğò£¬ºóÃæ·´½âÎöÒ²Òª°´ÕÕÍ¬ÑùµÄ¸ñÊ½
         StringBuilder builder = new StringBuilder();
         builder.append(id).append(",");
         builder.append(mode).append(",");
@@ -47,7 +47,7 @@ public class FileDesc {
         return builder.toString();
     }
 
-    /* æŒ‰ç…§ä¸€å®šæ ¼å¼ä»å­—ç¬¦ä¸²ä¸­è§£æå‡º FileDescçš„ä¿¡æ¯ */
+    /* °´ÕÕÒ»¶¨¸ñÊ½´Ó×Ö·û´®ÖĞ½âÎö³ö FileDescµÄĞÅÏ¢ */
     public static FileDesc fromString(String str) {
         if (str == null) {
             return null;
@@ -71,7 +71,7 @@ public class FileDesc {
         return new FileDesc(id, mode, fileMetadata);
     }
 
-    // è¾…åŠ©æ–¹æ³•ï¼šå°† List<DataBlock> è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+    // ¸¨Öú·½·¨£º½« List<DataBlock> ×ª»»Îª×Ö·û´®
     private static String dataBlocksToString(List<FileMetadata.DataBlock> dataBlocks) {
         StringBuilder sb = new StringBuilder();
         for (FileMetadata.DataBlock block : dataBlocks) {
@@ -80,7 +80,7 @@ public class FileDesc {
         return sb.toString();
     }
 
-    // è¾…åŠ©æ–¹æ³•ï¼šå°†å­—ç¬¦ä¸²è½¬æ¢ä¸º List<DataBlock>
+    // ¸¨Öú·½·¨£º½«×Ö·û´®×ª»»Îª List<DataBlock>
     private static List<FileMetadata.DataBlock> stringToDataBlocks(String str) {
         List<FileMetadata.DataBlock> dataBlocks = new ArrayList<>();
         if (!str.equals("")) {
@@ -95,19 +95,19 @@ public class FileDesc {
         return dataBlocks;
     }
 
-//    // è¾…åŠ©æ–¹æ³•ï¼šå°† Date è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+//    // ¸¨Öú·½·¨£º½« Date ×ª»»Îª×Ö·û´®
 //    private static String dateToString(Date date) {
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //        return dateFormat.format(date);
 //    }
 //
-//    // è¾…åŠ©æ–¹æ³•ï¼šå°†å­—ç¬¦ä¸²è½¬æ¢ä¸º Date
+//    // ¸¨Öú·½·¨£º½«×Ö·û´®×ª»»Îª Date
 //    private static Date stringToDate(String str) {
 //        try {
 //            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //            return dateFormat.parse(str);
 //        } catch (Exception e) {
-//            // å¤„ç†å¼‚å¸¸
+//            // ´¦ÀíÒì³£
 //            return null;
 //        }
 //    }

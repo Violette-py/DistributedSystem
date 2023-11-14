@@ -47,13 +47,13 @@ public class NameNodeLauncher {
             // bind to Naming
             NameComponent[] path = ncRef.to_name("NameNode");
             ncRef.rebind(path, href);
+
             System.out.println("NameNode is ready and waiting...");
 
             // waiting
             orb.run();
-        } catch (WrongPolicy | InvalidName | ServantNotActive | AdapterInactive |
-                 org.omg.CosNaming.NamingContextPackage.InvalidName | CannotProceed | NotFound e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

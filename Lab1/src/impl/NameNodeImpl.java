@@ -15,21 +15,21 @@ import java.util.*;
 
 public class NameNodeImpl extends NameNodePOA {
 
-    /* NameNodeç»´æŠ¤ä¸€ä¸ªæŒä¹…åŒ–çš„ FsImageï¼Œå…¶ä¸­è®°å½•äº†æ–‡ä»¶ç›®å½•ç»“æ„å’Œæ‰€æœ‰æ–‡ä»¶çš„å…ƒæ•°æ®ä¿¡æ¯ */
+    /* NameNodeÎ¬»¤Ò»¸ö³Ö¾Ã»¯µÄ FsImage£¬ÆäÖĞ¼ÇÂ¼ÁËÎÄ¼şÄ¿Â¼½á¹¹ºÍËùÓĞÎÄ¼şµÄÔªÊı¾İĞÅÏ¢ */
     // FsImage fsImage;
 
-    // è®°å½•æ‰“å¼€çš„æ–‡ä»¶çš„ fdï¼ˆä¹Ÿå³ FileDescçš„ idçš„å¢é•¿ -- æ¯ä¸ª openè¯·æ±‚ï¼Œå³ä½¿è¯»åŒä¸€ä¸ªæ–‡ä»¶ï¼Œè¿”å›çš„ FileDescä¹Ÿåº”è¯¥ä¸åŒï¼‰
+    // ¼ÇÂ¼´ò¿ªµÄÎÄ¼şµÄ fd£¨Ò²¼´ FileDescµÄ idµÄÔö³¤ -- Ã¿¸ö openÇëÇó£¬¼´Ê¹¶ÁÍ¬Ò»¸öÎÄ¼ş£¬·µ»ØµÄ FileDescÒ²Ó¦¸Ã²»Í¬£©
     private static long counter = 1;
 
-    // ä¿å­˜ fd - FileDesc çš„é”®å€¼å¯¹ï¼Œå…¶ä¸­ fd å°±æ˜¯ FileDescçš„ idï¼Œä½†æ˜¯ä¸ºäº†ä¾¿äºæŸ¥æ‰¾ï¼Œæ‰€ä»¥æå‡ºæ¥å†™æˆ Mapçš„å½¢å¼
+    // ±£´æ fd - FileDesc µÄ¼üÖµ¶Ô£¬ÆäÖĞ fd ¾ÍÊÇ FileDescµÄ id£¬µ«ÊÇÎªÁË±ãÓÚ²éÕÒ£¬ËùÒÔÌá³öÀ´Ğ´³É MapµÄĞÎÊ½
     private List<FileDesc> openFiles;
-//    private Map<Long, FileDesc> openFiles; // å®¢æˆ·ç«¯è®°å½•è¿™ç§æ˜ å°„å…³ç³»å¯ä»¥ä¾¿äºå¯¹åº” fdï¼Œ NameNodeç«¯å°±ä¸éœ€è¦äº†
+//    private Map<Long, FileDesc> openFiles; // ¿Í»§¶Ë¼ÇÂ¼ÕâÖÖÓ³Éä¹ØÏµ¿ÉÒÔ±ãÓÚ¶ÔÓ¦ fd£¬ NameNode¶Ë¾Í²»ĞèÒªÁË
 
     public NameNodeImpl() {
         openFiles = new ArrayList<>();
 //        openFiles = new HashMap<>();
         // fsImage = loadFsImage();
-        // å½“ç„¶ä¸æ˜¯åœ¨ NameNodeå¯åŠ¨æ—¶å°±æŠŠ FsImage loadè¿›æ¥ï¼Œå› ä¸ºåé¢ FsImageè¿˜ä¼šæ”¹ -> åº”è¯¥åœ¨ç”¨çš„åœ°æ–¹å† load
+        // µ±È»²»ÊÇÔÚ NameNodeÆô¶¯Ê±¾Í°Ñ FsImage load½øÀ´£¬ÒòÎªºóÃæ FsImage»¹»á¸Ä -> Ó¦¸ÃÔÚÓÃµÄµØ·½ÔÙ load
     }
 
     @Override
@@ -37,29 +37,29 @@ public class NameNodeImpl extends NameNodePOA {
 
         System.out.println("---- NameNode / open ----");
 
-        // æ³¨æ„ï¼šopenFilesçš„å®æ—¶æ›´æ–° -- æ¯æ¬¡ new FileDescéƒ½è¦åŠ å…¥ List
+        // ×¢Òâ£ºopenFilesµÄÊµÊ±¸üĞÂ -- Ã¿´Î new FileDesc¶¼Òª¼ÓÈë List
 
-        // é¦–å…ˆæ£€æŸ¥ FsImageä¸­æ˜¯å¦æœ‰è¯¥æ–‡ä»¶
+        // Ê×ÏÈ¼ì²é FsImageÖĞÊÇ·ñÓĞ¸ÃÎÄ¼ş
         FileMetadata fileMetadata = findFileInDisk(filepath);
         System.out.println("after find file in disk");
 
-        // è‹¥æ–‡ä»¶ä¸å­˜åœ¨äºç£ç›˜ä¸­
+        // ÈôÎÄ¼ş²»´æÔÚÓÚ´ÅÅÌÖĞ
         if (fileMetadata == null) {
 
             System.out.println("file is not in disk");
 
-            // æŸ¥æ‰¾å†…å­˜ä¸­æ˜¯å¦æœ‰è¯¥æ–‡ä»¶ï¼ˆå…¶ä»–å®¢æˆ·ç«¯åˆ›å»ºä½†è¿˜æœªæŒä¹…åŒ–åˆ° FsImageä¸­ï¼‰
+            // ²éÕÒÄÚ´æÖĞÊÇ·ñÓĞ¸ÃÎÄ¼ş£¨ÆäËû¿Í»§¶Ë´´½¨µ«»¹Î´³Ö¾Ã»¯µ½ FsImageÖĞ£©
             for (FileDesc existingFile : openFiles) {
                 if (existingFile.getFileMetadata().getFilepath().equals(filepath)) {
                     System.out.println("file is created but still not stored in FsImage");
                     if (isWriteMode(mode) && isWriteMode(existingFile.getMode())) {
-                        // æ–‡ä»¶æ­£åœ¨è¢«å†™å…¥ï¼Œä¸å…è®¸å…¶ä»–å®¢æˆ·ç«¯ä»¥å†™æ¨¡å¼æ‰“å¼€
+                        // ÎÄ¼şÕıÔÚ±»Ğ´Èë£¬²»ÔÊĞíÆäËû¿Í»§¶ËÒÔĞ´Ä£Ê½´ò¿ª
                         return null;
                     } else {
                         long fileId = counter++;
-                        // å†…å­˜ä¸­æœ‰æ–°å»ºçš„ä½†è¿˜æœªè¢«æŒä¹…åŒ–è®°å½•å…ƒæ•°æ®ä¿¡æ¯çš„æ–‡ä»¶ï¼Œè¿™æ ·ç›´æ¥èµ‹å€¼ metadataå¯ä»¥è®©æ–°çš„å®¢æˆ·ç«¯èƒ½è¯»åˆ°æœ€æ–°å†™å…¥çš„æ•°æ®
+                        // ÄÚ´æÖĞÓĞĞÂ½¨µÄµ«»¹Î´±»³Ö¾Ã»¯¼ÇÂ¼ÔªÊı¾İĞÅÏ¢µÄÎÄ¼ş£¬ÕâÑùÖ±½Ó¸³Öµ metadata¿ÉÒÔÈÃĞÂµÄ¿Í»§¶ËÄÜ¶Áµ½×îĞÂĞ´ÈëµÄÊı¾İ
                         FileDesc fileDesc = new FileDesc(fileId, mode, existingFile.getFileMetadata());
-                        fileDesc.getFileMetadata().setAccessTime(getCurrentTime());  // å…·ä½“çš„ modifyTime æ˜¯åœ¨ appendä¸­ä¿®æ”¹çš„
+                        fileDesc.getFileMetadata().setAccessTime(getCurrentTime());  // ¾ßÌåµÄ modifyTime ÊÇÔÚ appendÖĞĞŞ¸ÄµÄ
                         openFiles.add(fileDesc);
                         return existingFile.toString();
                     }
@@ -67,32 +67,32 @@ public class NameNodeImpl extends NameNodePOA {
             }
             System.out.println("file is not in memory");
             System.out.println("so now create it ...");
-            // ç£ç›˜å’Œå†…å­˜ä¸­å‡æ²¡æœ‰å¯¹åº”æ–‡ä»¶ï¼Œåˆ™æ–°å»º
+            // ´ÅÅÌºÍÄÚ´æÖĞ¾ùÃ»ÓĞ¶ÔÓ¦ÎÄ¼ş£¬ÔòĞÂ½¨
             fileMetadata = createNewFile(filepath);
         }
 
-        // ç”Ÿæˆæ–°çš„æ–‡ä»¶æè¿°ç¬¦ï¼ˆFileDescï¼‰
+        // Éú³ÉĞÂµÄÎÄ¼şÃèÊö·û£¨FileDesc£©
         FileDesc fileDesc = new FileDesc(counter++, mode, fileMetadata);
         openFiles.add(fileDesc);
 
         System.out.println("new created fileDesc : " + fileDesc);
 
-        // è¿”å›æ–‡ä»¶æè¿°ç¬¦çš„å­—ç¬¦ä¸²è¡¨ç¤ºå½¢å¼
+        // ·µ»ØÎÄ¼şÃèÊö·ûµÄ×Ö·û´®±íÊ¾ĞÎÊ½
         return fileDesc.toString();
     }
 
-    /* å…³é—­æ–‡ä»¶ï¼ŒåŒæ—¶å°†æ–‡ä»¶çš„å…ƒæ•°æ®ä¿¡æ¯ï¼ˆè€Œéæ–‡ä»¶æ•°æ®æœ¬èº«ï¼‰æ›´æ–°æŒä¹…åŒ–åˆ°ç¡¬ç›˜ä¸­ */
+    /* ¹Ø±ÕÎÄ¼ş£¬Í¬Ê±½«ÎÄ¼şµÄÔªÊı¾İĞÅÏ¢£¨¶ø·ÇÎÄ¼şÊı¾İ±¾Éí£©¸üĞÂ³Ö¾Ã»¯µ½Ó²ÅÌÖĞ */
     @Override
     public void close(String fileInfo) {
 
-        // åŠ è½½å½“å‰çš„ FsImage
+        // ¼ÓÔØµ±Ç°µÄ FsImage
         FsImage fsImage = loadFsImage();
         List<FileMetadata> existingFiles = fsImage.getFiles();
 
         FileDesc fileDesc = FileDesc.fromString(fileInfo);
         FileMetadata newFileMetadata = fileDesc.getFileMetadata();
 
-        // æ›´æ–°æŒä¹…åŒ–åˆ° FsImageä¸­ï¼šè‹¥å·²å­˜åœ¨è¯¥æ–‡ä»¶ï¼ˆè·¯å¾„ä¸€è‡´ï¼‰ï¼Œåˆ™æ›´æ–°å…¶ä½™ä¿¡æ¯ï¼›è‹¥ä¸å­˜åœ¨ï¼Œåˆ™æ–°å¢
+        // ¸üĞÂ³Ö¾Ã»¯µ½ FsImageÖĞ£ºÈôÒÑ´æÔÚ¸ÃÎÄ¼ş£¨Â·¾¶Ò»ÖÂ£©£¬Ôò¸üĞÂÆäÓàĞÅÏ¢£»Èô²»´æÔÚ£¬ÔòĞÂÔö
         boolean fileExists = false;
         for (FileMetadata existingFile : existingFiles) {
             if (existingFile.getFilepath().equals(newFileMetadata.getFilepath())) {
@@ -102,25 +102,25 @@ public class NameNodeImpl extends NameNodePOA {
             }
         }
 
-        // å¦‚æœä¸å­˜åœ¨ç›¸åŒè·¯å¾„çš„æ–‡ä»¶å…ƒæ•°æ®ï¼Œæ·»åŠ æ–°çš„æ–‡ä»¶æ•°æ®ä¿¡æ¯
+        // Èç¹û²»´æÔÚÏàÍ¬Â·¾¶µÄÎÄ¼şÔªÊı¾İ£¬Ìí¼ÓĞÂµÄÎÄ¼şÊı¾İĞÅÏ¢
         if (!fileExists) {
             existingFiles.add(newFileMetadata);
         }
 
-        File xmlFile = new File("src/resources/FsImage.xml"); // TODO: æå–æˆå¸¸é‡
+        File xmlFile = new File("src/resources/FsImage.xml"); // TODO: ÌáÈ¡³É³£Á¿
         try {
             FsImageXmlHandler.marshal(fsImage, xmlFile);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
 
-        // FIXME: åœ¨æ‰‹åŠ¨æµ‹è¯•çš„æ—¶å€™æ£€æŸ¥ä¸€ä¸‹è¿™é‡Œï¼Œå•å…ƒæµ‹è¯•å› ä¸ºé€Ÿåº¦å¤ªå¿«è€Œæ²¡æœ‰æ›´æ–°ï¼Ÿ
+        // FIXME: ÔÚÊÖ¶¯²âÊÔµÄÊ±ºò¼ì²éÒ»ÏÂÕâÀï£¬µ¥Ôª²âÊÔÒòÎªËÙ¶ÈÌ«¿ì¶øÃ»ÓĞ¸üĞÂ£¿
 //        System.out.println("before delete FileDesc from memory, openFiles.size() : " + openFiles.size());
 //        for (FileDesc existingFile: openFiles) {
 //            System.out.println(existingFile.getFileMetadata().getFilepath());
 //        }
 
-        // æŠŠå†…å­˜ä¸­è¯¥ openè¯·æ±‚çš„ä¿¡æ¯åˆ æ‰
+        // °ÑÄÚ´æÖĞ¸Ã openÇëÇóµÄĞÅÏ¢É¾µô
         openFiles.removeIf(value -> value.getId() == fileDesc.getId());
 
 //        System.out.println("After delete FileDesc from memory, openFiles.size() : " + openFiles.size());
@@ -130,17 +130,17 @@ public class NameNodeImpl extends NameNodePOA {
 
     }
 
-    /* æ›´æ–°æ–‡ä»¶å…ƒæ•°æ®ä¿¡æ¯ */
+    /* ¸üĞÂÎÄ¼şÔªÊı¾İĞÅÏ¢ */
     private void updateFileMetadata(FileMetadata existingFile, FileMetadata newFile) {
-        // æ›´æ–°ç°æœ‰æ–‡ä»¶å…ƒæ•°æ®çš„å…¶ä»–ä¿¡æ¯
+        // ¸üĞÂÏÖÓĞÎÄ¼şÔªÊı¾İµÄÆäËûĞÅÏ¢
         existingFile.setFileSize(newFile.getFileSize());
         existingFile.setDataBlocks(newFile.getDataBlocks());
         existingFile.setModifyTime(newFile.getModifyTime());
         existingFile.setAccessTime(newFile.getAccessTime());
-        // æ³¨æ„ï¼šæ²¡æ›´æ–° createTime hh
+        // ×¢Òâ£ºÃ»¸üĞÂ createTime hh
     }
 
-    /* åœ¨å†…å­˜ä¸­æŸ¥æ‰¾æ–‡ä»¶ï¼ˆå¯èƒ½å®¢æˆ·ç«¯æ–°å»ºåå°šæœª closeï¼Œä¹Ÿå°±æ²¡æœ‰æŒä¹…åŒ–åˆ° FsImageä¸­ï¼‰ */
+    /* ÔÚÄÚ´æÖĞ²éÕÒÎÄ¼ş£¨¿ÉÄÜ¿Í»§¶ËĞÂ½¨ºóÉĞÎ´ close£¬Ò²¾ÍÃ»ÓĞ³Ö¾Ã»¯µ½ FsImageÖĞ£© */
     private FileDesc findFileInMemory(String filepath) {
         for (FileDesc fileDesc : openFiles) {
             if (fileDesc.getFileMetadata().getFilepath().equals(filepath)) {
@@ -150,7 +150,7 @@ public class NameNodeImpl extends NameNodePOA {
         return null;
     }
 
-    /* åœ¨ FsImageä¸­æŸ¥æ‰¾æ–‡ä»¶ */
+    /* ÔÚ FsImageÖĞ²éÕÒÎÄ¼ş */
     private FileMetadata findFileInDisk(String filepath) {
 //        System.out.println("before loadFsImage");
         FsImage fsImage = loadFsImage();
@@ -168,38 +168,38 @@ public class NameNodeImpl extends NameNodePOA {
         return null;
     }
 
-    /* è·¯å¾„æŒ‡å‘ä¸å­˜åœ¨æ–‡ä»¶æ—¶ï¼Œæ–°å»ºæ–‡ä»¶ */
-    // è¿™é‡Œçš„åˆ›å»ºå®é™…ä¸Šæ˜¯åœ¨å†…å­˜ä¸­æš‚æ—¶åˆ›å»ºï¼Œè¿˜æœªæŒä¹…åŒ–åˆ° FsImage
+    /* Â·¾¶Ö¸Ïò²»´æÔÚÎÄ¼şÊ±£¬ĞÂ½¨ÎÄ¼ş */
+    // ÕâÀïµÄ´´½¨Êµ¼ÊÉÏÊÇÔÚÄÚ´æÖĞÔİÊ±´´½¨£¬»¹Î´³Ö¾Ã»¯µ½ FsImage
     private FileMetadata createNewFile(String filepath) {
         String time = getCurrentTime();
-        return new FileMetadata(filepath, 0, new ArrayList<>(), time, time, time); // æ–°å»ºæ–‡ä»¶æ—¶ï¼Œå°šæœªåˆ†é… block
+        return new FileMetadata(filepath, 0, new ArrayList<>(), time, time, time); // ĞÂ½¨ÎÄ¼şÊ±£¬ÉĞÎ´·ÖÅä block
     }
 
-    /* ä» XMLæ–‡ä»¶ä¸­åŠ è½½ FsImageå¯¹è±¡æ¥è¿›ä¸€æ­¥æ£€ç´¢å…·ä½“ä¿¡æ¯ */
+    /* ´Ó XMLÎÄ¼şÖĞ¼ÓÔØ FsImage¶ÔÏóÀ´½øÒ»²½¼ìË÷¾ßÌåĞÅÏ¢ */
     private FsImage loadFsImage() {
         FsImage fsImageTemp = null;
-        File xmlFile = new File("src/resources/FsImage.xml"); // TODO: æå–æˆå¸¸é‡
+        File xmlFile = new File("src/resources/FsImage.xml"); // TODO: ÌáÈ¡³É³£Á¿
         if (xmlFile.exists()) {
             System.out.println("xmlFile exist");
             try {
-                fsImageTemp = FsImageXmlHandler.unmarshal(xmlFile);  // ä» xmlæ–‡ä»¶ä¸­è¯»å– FsImageå¯¹è±¡
+                fsImageTemp = FsImageXmlHandler.unmarshal(xmlFile);  // ´Ó xmlÎÄ¼şÖĞ¶ÁÈ¡ FsImage¶ÔÏó
             } catch (JAXBException e) {
                 e.printStackTrace();
             }
         } else {
             System.out.println("xmlFile not exist");
-            fsImageTemp = new FsImage(); // è‹¥ xmlæ–‡ä»¶ä¸å­˜åœ¨  // TODO: é¡¹ç›®å¯åŠ¨æ—¶ï¼Œæ˜¯å¦éœ€è¦å†™ä¸€ä¸ª xmlæ–‡ä»¶çš„åˆå§‹åŒ–
+            fsImageTemp = new FsImage(); // Èô xmlÎÄ¼ş²»´æÔÚ  // TODO: ÏîÄ¿Æô¶¯Ê±£¬ÊÇ·ñĞèÒªĞ´Ò»¸ö xmlÎÄ¼şµÄ³õÊ¼»¯
         }
         return fsImageTemp;
     }
 
-    /* åˆ¤æ–­æ˜¯å¦æ˜¯å†™æ¨¡å¼ */
+    /* ÅĞ¶ÏÊÇ·ñÊÇĞ´Ä£Ê½ */
     private boolean isWriteMode(int mode) {
-        // åˆ¤æ–­é«˜ä½æ˜¯å¦ä¸º 1
+        // ÅĞ¶Ï¸ßÎ»ÊÇ·ñÎª 1
         return (mode & 0b10) != 0;
     }
 
-    /* è·å–å½“å‰æ—¶é—´ */
+    /* »ñÈ¡µ±Ç°Ê±¼ä */
     public static String getCurrentTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();

@@ -3,6 +3,7 @@ package impl;
 import api.DataNodePOA;
 
 import java.io.*;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,11 +14,11 @@ public class DataNodeImpl extends DataNodePOA {
     private final int BLOCK_SIZE = 4 * 1024;
     private final String BASE_DATA_DIRECTORY = "src/resources";
     private final String dataDirectory;
-    private static int counter = 1;
+    private static int counter = 0;
     //    private static int dataNodeID = 1;
     private int dataNodeID;
-    private List<Integer> blockIDList;  // æ¯ä¸ª blockéƒ½å¯¹åº”ä¸€ä¸ª .txtæ–‡ä»¶
-    // ä¸éœ€è¦åœ¨å†…å­˜é‡Œè®°å½• blockId -> byte çš„æ˜ å°„ï¼Œå› ä¸ºç›´æ¥è·Ÿç¡¬ç›˜äº¤äº’ï¼Œåªéœ€è¦è®°å½• blockidçš„åˆ—è¡¨å³å¯
+    private List<Integer> blockIDList;  // Ã¿¸ö block¶¼¶ÔÓ¦Ò»¸ö .txtÎÄ¼ş
+    // ²»ĞèÒªÔÚÄÚ´æÀï¼ÇÂ¼ blockId -> byte µÄÓ³Éä£¬ÒòÎªÖ±½Ó¸úÓ²ÅÌ½»»¥£¬Ö»ĞèÒª¼ÇÂ¼ blockidµÄÁĞ±í¼´¿É
 //    private final Map<Integer, String> blockToFileMap;
 
     private final Random random;
@@ -26,7 +27,7 @@ public class DataNodeImpl extends DataNodePOA {
         this.dataNodeID = counter++;
         this.blockIDList = new ArrayList<>();
 
-        // ä¸ºæ¯ä¸ª DataNodeç»´æŠ¤ä¸€ä¸ªæ–‡ä»¶ç›®å½•ï¼Œç”¨äºå­˜å‚¨æ•°æ®æ–‡ä»¶ eg. dataNode1ä» src/resources/datanode_1 ä¸‹è¯»å–æ•°æ®
+        // ÎªÃ¿¸ö DataNodeÎ¬»¤Ò»¸öÎÄ¼şÄ¿Â¼£¬ÓÃÓÚ´æ´¢Êı¾İÎÄ¼ş eg. dataNode1´Ó src/resources/datanode_1 ÏÂ¶ÁÈ¡Êı¾İ
         this.dataDirectory = this.BASE_DATA_DIRECTORY + File.separator + "datanode_" + this.dataNodeID;
         File dir = new File(this.dataDirectory);
         if (!dir.exists()) {
@@ -35,17 +36,19 @@ public class DataNodeImpl extends DataNodePOA {
         this.random = new Random();
     }
 
-    /* è¯»å–æŸä¸ªæ•°æ®å—çš„æ‰€æœ‰æ•°æ® */
-    // DataNodeåœ¨å®¢æˆ·ç«¯åˆ†é…ï¼Œä¼šç›´æ¥è°ƒç”¨æŸ DataNodeçš„ readæ–¹æ³•ï¼Œæ‰€ä»¥è¿™é‡Œ readåªéœ€è¦ä¼  block_idå³å¯
+    /* ¶ÁÈ¡Ä³¸öÊı¾İ¿éµÄËùÓĞÊı¾İ */
+    // DataNodeÔÚ¿Í»§¶Ë·ÖÅä£¬»áÖ±½Óµ÷ÓÃÄ³ DataNodeµÄ read·½·¨£¬ËùÒÔÕâÀï readÖ»ĞèÒª´« block_id¼´¿É
     @Override
     public byte[] read(int block_id) {
 
-        String filePath = this.dataDirectory + File.separator + block_id;
+        String filePath = this.dataDirectory + File.separator + "block_" + block_id + ".txt";
 
         try {
-            // è¯»å–æ–‡ä»¶å†…å®¹å¹¶è¿”å›
+            // ¶ÁÈ¡ÎÄ¼şÄÚÈİ²¢·µ»Ø
             Path path = Paths.get(filePath);
             return Files.readAllBytes(path);
+        } catch (NoSuchFileException e) {
+            return new byte[0];
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,44 +56,41 @@ public class DataNodeImpl extends DataNodePOA {
         return new byte[0];
     }
 
-    /* å‘æŸä¸ªæ•°æ®å—æœ«å°¾è¿½åŠ æ•°æ® */
-    // FIXME: å¦‚æœè¯¥æ•°æ®å—ä¸å­˜åœ¨åº”è¯¥æŠ›å‡ºå¼‚å¸¸ï¼Ÿ -- å…¶å®åº”è¯¥ä¸ä¼šä¸å­˜åœ¨ï¼Œå’Œå®¢æˆ·ç«¯çº¦å®šå¥½äº†
+    /* ÏòÄ³¸öÊı¾İ¿éÄ©Î²×·¼ÓÊı¾İ */
+    // FIXME: Èç¹û¸ÃÊı¾İ¿é²»´æÔÚÓ¦¸ÃÅ×³öÒì³££¿ -- ÆäÊµÓ¦¸Ã²»»á²»´æÔÚ£¬ºÍ¿Í»§¶ËÔ¼¶¨ºÃÁË
     @Override
     public int append(int block_id, byte[] bytes) {
 
-        // å¦‚æœ block_id ä¸º -1ï¼Œè¯´æ˜æ˜¯ä¸€ä¸ªæ–°æ–‡ä»¶ï¼Œåˆ™éšæœºåˆ†é…ä¸€ä¸ªå—å·
-        if (block_id == -1) {
+        // Èç¹û block_id Îª -1£¬ËµÃ÷ÊÇÒ»¸öĞÂÎÄ¼ş£¬ÔòËæ»ú·ÖÅäÒ»¸ö¿éºÅ
+        if (block_id <= 0) {
             block_id = randomBlockId();
-            String filePath = this.dataDirectory + File.separator + block_id + ".txt";
-            try {
-                // åˆ›å»ºæ–°çš„å—æ–‡ä»¶
-                Files.createFile(Paths.get(filePath));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return -1;
-            }
+            createNewBlockFile(block_id);
+        } else if (blockIDList.isEmpty() || blockIDList.contains(block_id)) {
+            // Èç¹û¶ÔÓ¦µÄ block»¹²»´æÔÚ£¬ÔòÒª´´½¨£¨¿´²âÊÔ´úÂë£©
+            createNewBlockFile(block_id);
         }
 
-        String filePath = this.dataDirectory + File.separator + block_id + ".txt";
+        String filePath = this.dataDirectory + File.separator + "block_" + block_id + ".txt";
+
         File file = new File(filePath);
 
-        // å‘ blockä¸­å†™å…¥æ•°æ®
-        try (FileOutputStream fos = new FileOutputStream(file, true)) {  // è¿½åŠ å†™æ¨¡å¼
-            // è®¡ç®—å½“å‰å—å‰©ä½™çš„ç©ºé—´
+        // Ïò blockÖĞĞ´ÈëÊı¾İ
+        try (FileOutputStream fos = new FileOutputStream(file, true)) {  // ×·¼ÓĞ´Ä£Ê½
+            // ¼ÆËãµ±Ç°¿éÊ£ÓàµÄ¿Õ¼ä
             long remainingSpace = this.BLOCK_SIZE - file.length();
 
             if (remainingSpace >= bytes.length) {
-                // å¦‚æœå½“å‰å—çš„ç©ºé—´è¶³å¤Ÿï¼Œç›´æ¥å†™å…¥
+                // Èç¹ûµ±Ç°¿éµÄ¿Õ¼ä×ã¹»£¬Ö±½ÓĞ´Èë
                 fos.write(bytes);
                 return -1;
             } else {
-                // å°†éƒ¨åˆ†æ•°æ®å†™å…¥å½“å‰å—
+                // ½«²¿·ÖÊı¾İĞ´Èëµ±Ç°¿é
                 fos.write(bytes, 0, (int) remainingSpace);
 
-                // å‰©ä½™çš„æ•°æ®å†™å…¥æ–°å—
-                // è¿™é‡Œä¸ç”¨å¾ªç¯åˆ¤æ–­ï¼Œå› ä¸ºå®¢æˆ·ç«¯å·²ç»åˆ‡å¥½å—äº†ï¼Œè‡³å¤šåˆ†é…ä¸€ä¸ªæ–°å—å°±å¤Ÿäº†
+                // Ê£ÓàµÄÊı¾İĞ´ÈëĞÂ¿é
+                // ÕâÀï²»ÓÃÑ­»·ÅĞ¶Ï£¬ÒòÎª¿Í»§¶ËÒÑ¾­ÇĞºÃ¿éÁË£¬ÖÁ¶à·ÖÅäÒ»¸öĞÂ¿é¾Í¹»ÁË
                 int newBlockId = randomBlockId();
-                String newFilePath = this.dataDirectory + File.separator + "block_" + newBlockId + ".txt";
+                String newFilePath = this.dataDirectory + File.separator + "block_" + block_id + ".txt";
                 Files.createFile(Paths.get(newFilePath));
 
                 try (FileOutputStream newFos = new FileOutputStream(newFilePath, true)) {
@@ -112,10 +112,25 @@ public class DataNodeImpl extends DataNodePOA {
     public int randomBlockId() {
         int newBlockId;
         do {
-            newBlockId = new Random().nextInt(BLOCK_NUM) + 1;  // FIXME: èŒƒå›´æ˜¯å¤šå°‘
+            newBlockId = new Random().nextInt(BLOCK_NUM) + 1;  // FIXME: ·¶Î§ÊÇ¶àÉÙ
         } while (this.blockIDList.contains(newBlockId));
 
         this.blockIDList.add(newBlockId);
         return newBlockId;
     }
+
+    /* ´´½¨ĞÂµÄ¿éÎÄ¼ş block_id.txt */
+    private boolean createNewBlockFile(int block_id) {
+        String filePath = this.dataDirectory + File.separator + "block_" + block_id + ".txt";
+
+        try {
+            // ´´½¨ĞÂµÄ¿éÎÄ¼ş
+            Files.createFile(Paths.get(filePath));
+            return true;  // ·µ»Ø´´½¨µÄ¿éµÄID
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;  // ·µ»Ø-1±íÊ¾´´½¨Ê§°Ü
+        }
+    }
+
 }

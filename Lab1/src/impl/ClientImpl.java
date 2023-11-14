@@ -2,7 +2,10 @@ package impl;
 
 // TODO: your implementation
 
-import api.Client;
+import api.*;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
 import utils.FileDesc;
 import utils.FileMetadata;
 
@@ -10,36 +13,67 @@ import java.util.*;
 
 public class ClientImpl implements Client {
     private final int BLOCK_SIZE = 4 * 1024;
-    private final int DATANODE_NUM = 2;  // ç›®å‰å‡è®¾åªæœ‰ 2ä¸ªæ•°æ®èŠ‚ç‚¹
-    private static NameNodeImpl nn;
-    private static DataNodeImpl[] dn;
-    private Map<Integer, FileDesc> openFiles; // å½“å‰å®¢æˆ·ç«¯æ‰“å¼€çš„æ–‡ä»¶ï¼Œå’Œ NameNodeï¼ˆå­˜æ‰€æœ‰å®¢æˆ·ç«¯ï¼‰ä¸åŒ
+    private final int MAX_DATA_NODE = 2;  // Ä¿Ç°¼ÙÉèÖ»ÓĞ 2¸öÊı¾İ½Úµã
+
+    // ×¢ÒâÕâÀïÊÇ NameNode ¶ø²»ÊÇ NameNodeImpl
+    private NameNode nameNode;
+    private DataNode[] dataNodes = new DataNode[MAX_DATA_NODE];
+    private Map<Integer, FileDesc> openFiles; // µ±Ç°¿Í»§¶Ë´ò¿ªµÄÎÄ¼ş£¬ºÍ NameNode£¨´æËùÓĞ¿Í»§¶Ë£©²»Í¬
 
     public ClientImpl() {
-        // åˆå§‹åŒ– DataNode
-        dn = new DataNodeImpl[DATANODE_NUM];
-        for (int i = 0; i < DATANODE_NUM; i++) {
-            dn[i] = new DataNodeImpl();
+        // ³õÊ¼»¯ DataNode
+//        dn = new DataNodeImpl[DATANODE_NUM];
+//        for (int i = 0; i < DATANODE_NUM; i++) {
+//            dn[i] = new DataNodeImpl();
+//        }
+
+        openFiles = new HashMap<>();
+
+        // FIXME: Õâ¸ö idsÊÇÊ²Ã´
+//        Arrays.fill(ids, -1);
+        try {
+            String[] args = {};
+            Properties properties = new Properties();
+            properties.put("org.omg.CORBA.ORBInitialHost", "127.0.0.1"); // ORB IP
+            properties.put("org.omg.CORBA.ORBInitialPort", "1050");      // 0RB port
+
+            // new ORB object
+            ORB orb = ORB.init(args, properties);
+
+            // Naming context
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            // obtain a remote object
+            nameNode = NameNodeHelper.narrow(ncRef.resolve_str("NameNode"));
+            System.out.println("NameNode is obtained.");
+
+            for (int dataNodeId = 0; dataNodeId < MAX_DATA_NODE; dataNodeId++) {
+                dataNodes[dataNodeId] = DataNodeHelper.narrow(ncRef.resolve_str("DataNode" + dataNodeId));
+                System.out.println("DataNode" + dataNodeId + "is obtained.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    /* å‘ NameNodeè¯·æ±‚æ–‡ä»¶çš„å…ƒæ•°æ®ä¿¡æ¯ FileDesc */
+    /* Ïò NameNodeÇëÇóÎÄ¼şµÄÔªÊı¾İĞÅÏ¢ FileDesc */
     @Override
     public int open(String filepath, int mode) {
 
-        // å‘ NameNode è¯·æ±‚æ–‡ä»¶çš„å…ƒæ•°æ®ä¿¡æ¯ï¼Œè‹¥ä¸å­˜åœ¨åˆ™ä¼šæ–°å»ºï¼Œæ‰€ä»¥ä¸ç”¨æ‹…å¿ƒä¸º null
-        String fileInfo = nn.open(filepath, mode);
+        // Ïò NameNode ÇëÇóÎÄ¼şµÄÔªÊı¾İĞÅÏ¢£¬Èô²»´æÔÚÔò»áĞÂ½¨£¬ËùÒÔ²»ÓÃµ£ĞÄÎª null
+        String fileInfo = nameNode.open(filepath, mode);
 
-        // åœ¨å†…å­˜ä¸­å­˜å‚¨æ‰“å¼€çš„æ–‡ä»¶ä¿¡æ¯
+        // ÔÚÄÚ´æÖĞ´æ´¢´ò¿ªµÄÎÄ¼şĞÅÏ¢
         FileDesc fileDesc = FileDesc.fromString(fileInfo);
         openFiles.put((int) fileDesc.getId(), fileDesc);
-        // çœŸæ­£çš„ FileDescéƒ½æ˜¯åœ¨ NameNodeä¸­ newå‡ºæ¥çš„ï¼Œè¿™é‡Œå­˜å‚¨åªæ˜¯ä¸ºäº†è®©å®¢æˆ·ç«¯åˆ©ç”¨è¯¥ä¿¡æ¯ç›´æ¥ä¸ DataNodeäº¤äº’
-        // ä½†æ˜¯å®¢æˆ·ç«¯ä¸­çš„ FileDescçš„ä¿¡æ¯æ˜¯æœ€æ–°çš„ï¼Œå› ä¸ºè¯»å†™éƒ½æ˜¯å®¢æˆ·ç«¯ç›´æ¥ä¸ DataNodeäº¤äº’ï¼Œå¦‚æœè¦åŠ å—æ˜¯ç›´æ¥å‘Šè¯‰å®¢æˆ·ç«¯ï¼Œç„¶åå°†ä¿¡æ¯æ›´æ–°åœ¨å®¢æˆ·ç«¯ä¾§çš„ FileDesc
+        // ÕæÕıµÄ FileDesc¶¼ÊÇÔÚ NameNodeÖĞ new³öÀ´µÄ£¬ÕâÀï´æ´¢Ö»ÊÇÎªÁËÈÃ¿Í»§¶ËÀûÓÃ¸ÃĞÅÏ¢Ö±½ÓÓë DataNode½»»¥
+        // µ«ÊÇ¿Í»§¶ËÖĞµÄ FileDescµÄĞÅÏ¢ÊÇ×îĞÂµÄ£¬ÒòÎª¶ÁĞ´¶¼ÊÇ¿Í»§¶ËÖ±½ÓÓë DataNode½»»¥£¬Èç¹ûÒª¼Ó¿éÊÇÖ±½Ó¸æËß¿Í»§¶Ë£¬È»ºó½«ĞÅÏ¢¸üĞÂÔÚ¿Í»§¶Ë²àµÄ FileDesc
 
         return (int) fileDesc.getId();
     }
 
-    /* å‘æŸæ–‡ä»¶è¿½åŠ å†™ */
+    /* ÏòÄ³ÎÄ¼ş×·¼ÓĞ´ */
     @Override
     public void append(int fd, byte[] bytes) {
         FileDesc fileDesc = openFiles.get(fd);
@@ -52,53 +86,54 @@ public class ClientImpl implements Client {
         boolean isOldFile = (dataBlocks != null);
         boolean firstBytesBlockToWrite = true;
 
-        // å¯¹æ–‡ä»¶è¿›è¡Œåˆ‡å—
+        // ¶ÔÎÄ¼ş½øĞĞÇĞ¿é
         for (byte[] blockBytes : splitBytes(bytes)) {
 
-            // è€æ–‡ä»¶çš„ç¬¬ä¸€ä¸ªéœ€è¦å•ç‹¬å­˜
-            // è‹¥ä¸€ä¸ªæ–‡ä»¶æœ‰å¤šå—ï¼Œåªæœ‰ç¬¬ä¸€å—æ˜¯å­˜åœ¨ dataBlocks çš„æœ€åä¸€ä¸ªï¼ˆè®°å½• append çš„è¿”å›å€¼ï¼‰ï¼Œå‰©ä½™çš„éƒ½æ˜¯ random
+            // ÀÏÎÄ¼şµÄµÚÒ»¸öĞèÒªµ¥¶À´æ
+            // ÈôÒ»¸öÎÄ¼şÓĞ¶à¿é£¬Ö»ÓĞµÚÒ»¿éÊÇ´æÔÚ dataBlocks µÄ×îºóÒ»¸ö£¨¼ÇÂ¼ append µÄ·µ»ØÖµ£©£¬Ê£ÓàµÄ¶¼ÊÇ random
             if (isOldFile && firstBytesBlockToWrite) {
                 FileMetadata.DataBlock dataBlock = dataBlocks.get(dataBlocks.size() - 1);
                 dataNodeID = dataBlock.getDataNodeID();
                 blockID = dataBlock.getBlockID();
             } else {
-                // è€æ–‡ä»¶çš„åç»­å’Œæ–°æ–‡ä»¶çš„æ‰€æœ‰
+                // ÀÏÎÄ¼şµÄºóĞøºÍĞÂÎÄ¼şµÄËùÓĞ
                 dataNodeID = getRandomDataNodeID();
-                blockID = -1; // å¯¹äºå°šæœªåˆ†é…å—çš„ï¼Œå°† block_id æ ‡è¯†ä¸º -1ï¼Œåˆ° DataNode å†åˆ†é…
+                blockID = -1; // ¶ÔÓÚÉĞÎ´·ÖÅä¿éµÄ£¬½« block_id ±êÊ¶Îª -1£¬µ½ DataNode ÔÙ·ÖÅä
             }
 
-            newBlockID = dn[dataNodeID].append(blockID, blockBytes);
+            newBlockID = dataNodes[dataNodeID].append(blockID, blockBytes);
             firstBytesBlockToWrite = false;
             if (newBlockID != -1) {
-                // æ›´æ–°æ–‡ä»¶çš„æ•°æ®å—ä¿¡æ¯
+                // ¸üĞÂÎÄ¼şµÄÊı¾İ¿éĞÅÏ¢
                 fileMetadata.addDataBlock(dataNodeID, newBlockID);
             }
         }
 
     }
 
-    /* è¯»å–æŸä¸€æ–‡ä»¶æ•°æ® */
+    /* ¶ÁÈ¡Ä³Ò»ÎÄ¼şÊı¾İ */
     public byte[] read(int fd) {
         FileDesc fileDesc = openFiles.get(fd);
         FileMetadata fileMetadata = fileDesc.getFileMetadata();
         List<FileMetadata.DataBlock> dataBlocks = fileMetadata.getDataBlocks();
 
         if (dataBlocks == null || dataBlocks.isEmpty()) {
-            System.out.println("No data blocks available for reading.");
-            return new byte[0];
+            return null;
+//            System.out.println("No data blocks available for reading.");
+//            return new byte[0];
         }
 
         List<byte[]> allData = new ArrayList<>();
 
-        // æŠŠä¸€ä¸ªæ–‡ä»¶çš„æ‰€æœ‰åˆ†å—æŒ‰ç…§é¡ºåºï¼ˆå³dataBlocksä¸­çš„å—é¡ºåºï¼‰ç»„ç»‡èµ·æ¥
+        // °ÑÒ»¸öÎÄ¼şµÄËùÓĞ·Ö¿é°´ÕÕË³Ğò£¨¼´dataBlocksÖĞµÄ¿éË³Ğò£©×éÖ¯ÆğÀ´
         for (FileMetadata.DataBlock dataBlock : dataBlocks) {
             int dataNodeID = dataBlock.getDataNodeID();
             int blockID = dataBlock.getBlockID();
 
-            // å‘é€è¯»è¯·æ±‚åˆ° DataNode
-            byte[] blockData = dn[dataNodeID].read(blockID);
+            // ·¢ËÍ¶ÁÇëÇóµ½ DataNode
+            byte[] blockData = dataNodes[dataNodeID].read(blockID);
 
-            // å°†è¿”å›çš„æ•°æ®æ·»åŠ åˆ°ç»“æœé›†ä¸­
+            // ½«·µ»ØµÄÊı¾İÌí¼Óµ½½á¹û¼¯ÖĞ
             if (blockData.length > 0) {
                 allData.add(blockData);
             } else {
@@ -106,7 +141,7 @@ public class ClientImpl implements Client {
             }
         }
 
-        // å°†æ‰€æœ‰æ•°æ®å—ç»„ç»‡åœ¨ä¸€èµ·
+        // ½«ËùÓĞÊı¾İ¿é×éÖ¯ÔÚÒ»Æğ
         int totalLength = allData.stream().mapToInt(bytes -> bytes.length).sum();
         byte[] result = new byte[totalLength];
         int destPos = 0;
@@ -118,20 +153,20 @@ public class ClientImpl implements Client {
         return result;
     }
 
-    /* å…³é—­æ‰“å¼€çš„æ–‡ä»¶ */
+    /* ¹Ø±Õ´ò¿ªµÄÎÄ¼ş */
     @Override
     public void close(int fd) {
 
-        // å‘ NameNodeå‘é€è¯·æ±‚ï¼Œå°†æ–‡ä»¶å…ƒæ•°æ®æ›´æ–°æŒä¹…åŒ–åˆ° FsImageä¸­
+        // Ïò NameNode·¢ËÍÇëÇó£¬½«ÎÄ¼şÔªÊı¾İ¸üĞÂ³Ö¾Ã»¯µ½ FsImageÖĞ
         FileDesc fileDesc = openFiles.get(fd);
-        nn.close(fileDesc.toString());
+        nameNode.close(fileDesc.toString());
 
-        // é‡Šæ”¾å†…å­˜ä¸­æ–‡ä»¶çš„å…ƒæ•°æ®ä¿¡æ¯
+        // ÊÍ·ÅÄÚ´æÖĞÎÄ¼şµÄÔªÊı¾İĞÅÏ¢
         openFiles.remove(fd);
 
     }
 
-    /* åœ¨å®¢æˆ·ç«¯å¯¹è¦å­˜å‚¨çš„æ•°æ®è¿›è¡Œåˆ‡å— */
+    /* ÔÚ¿Í»§¶Ë¶ÔÒª´æ´¢µÄÊı¾İ½øĞĞÇĞ¿é */
     private List<byte[]> splitBytes(byte[] bytes) {
         List<byte[]> blocks = new ArrayList<>();
         for (int i = 0; i < bytes.length; i += this.BLOCK_SIZE) {
@@ -142,8 +177,8 @@ public class ClientImpl implements Client {
         return blocks;
     }
 
-    /* éšæœºåˆ†é… DataNode */
+    /* Ëæ»ú·ÖÅä DataNode */
     public int getRandomDataNodeID() {
-        return new Random().nextInt(DATANODE_NUM);  // æ£€æŸ¥æ•°ç»„è¶Šç•Œæƒ…å†µ
+        return new Random().nextInt(MAX_DATA_NODE);  // ¼ì²éÊı×éÔ½½çÇé¿ö
     }
 }

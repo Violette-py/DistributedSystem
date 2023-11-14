@@ -13,10 +13,13 @@ import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
+import utils.Constants;
 
 import java.util.Properties;
 
 public class DataNodeLauncher {
+
+//    private static int counter = 0; // 用于 DataNode id自增，与 Client侧 和 DataNodeImpl内 id自增 都对应
 
     public static void main(String[] args) {
 
@@ -45,16 +48,16 @@ public class DataNodeLauncher {
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
             // bind to Naming
-            NameComponent[] path = ncRef.to_name("DataNode");
+            NameComponent[] path = ncRef.to_name("DataNode" + Constants.DATANODE_ID);
+            Constants.DATANODE_ID++;
             ncRef.rebind(path, href);
 
             System.out.println("DataNode is ready and waiting...");
 
             // waiting
             orb.run();
-        } catch (WrongPolicy | InvalidName | ServantNotActive | AdapterInactive |
-                 org.omg.CosNaming.NamingContextPackage.InvalidName | CannotProceed | NotFound e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

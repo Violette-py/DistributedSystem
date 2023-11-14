@@ -7,30 +7,30 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
 
-/* XMLæ˜ å°„ç±»ï¼šæ–‡ä»¶çš„å…ƒæ•°æ®ä¿¡æ¯ */
+/* XMLÓ³ÉäÀà£ºÎÄ¼şµÄÔªÊı¾İĞÅÏ¢ */
 //@XmlElement(name = "file")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FileMetadata {
     @XmlElement(name = "filepath")
     private String filepath;
     @XmlElement(name = "fileSize")
-    private long fileSize;    // æ–‡ä»¶å¤§å°
+    private long fileSize;    // ÎÄ¼ş´óĞ¡
     @XmlElement(name = "dataBlocks")
-    private List<DataBlock> dataBlocks;  // æ–‡ä»¶å—æ‰€åœ¨ä½ç½®ï¼ˆå“ªä¸ªDataNodeä¸Šçš„å“ªä¸ª blockï¼‰
+    private List<DataBlock> dataBlocks;  // ÎÄ¼ş¿éËùÔÚÎ»ÖÃ£¨ÄÄ¸öDataNodeÉÏµÄÄÄ¸ö block£©
 
-    // FIXME: æŠŠæ—¶é—´æ”¹æˆ Stringç±»çš„ï¼Œå­˜å‚¨åœ¨ FsImageä¸­ä¼šå¥½çœ‹ä¸€ç‚¹ï¼Ÿ
+    // FIXME: °ÑÊ±¼ä¸Ä³É StringÀàµÄ£¬´æ´¢ÔÚ FsImageÖĞ»áºÃ¿´Ò»µã£¿
     @XmlElement(name = "createTime")
-    private String createTime; // åˆ›å»ºæ—¶é—´ -- åªåœ¨ NameNodeçš„ createNewFileå‡½æ•°ä¸­ç¬¬ä¸€æ¬¡è®¾ç½®
+    private String createTime; // ´´½¨Ê±¼ä -- Ö»ÔÚ NameNodeµÄ createNewFileº¯ÊıÖĞµÚÒ»´ÎÉèÖÃ
     @XmlElement(name = "modifyTime")
-    private String modifyTime; // ä¿®æ”¹æ—¶é—´ -- appendæ“ä½œå®Œæˆå
+    private String modifyTime; // ĞŞ¸ÄÊ±¼ä -- append²Ù×÷Íê³Éºó
     @XmlElement(name = "accessTime")
-    private String accessTime; // è®¿é—®æ—¶é—´ -- æ¯ä¸€æ¬¡ openè¯·æ±‚æ—¶
-    // ä»¥ä¸Šæ—¶é—´éƒ½æ˜¯æœ€è¿‘ä¸€æ¬¡çš„æ—¶é—´
+    private String accessTime; // ·ÃÎÊÊ±¼ä -- Ã¿Ò»´Î openÇëÇóÊ±
+    // ÒÔÉÏÊ±¼ä¶¼ÊÇ×î½üÒ»´ÎµÄÊ±¼ä
 
     public FileMetadata() {
     }
 
-    // æ—¶é—´åº”è¯¥æ˜¯åŠ¨æ€è®¾ç½®çš„ï¼Œè€Œéä½œä¸ºå‚æ•°ä¼ å…¥
+    // Ê±¼äÓ¦¸ÃÊÇ¶¯Ì¬ÉèÖÃµÄ£¬¶ø·Ç×÷Îª²ÎÊı´«Èë
     public FileMetadata(String filepath, long fileSize, List<DataBlock> dataBlocks) {
         this.filepath = filepath;
         this.fileSize = fileSize;
