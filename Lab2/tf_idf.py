@@ -6,9 +6,9 @@ import os
 
 from math import log
 
-from preprocess import tokenize
-from preprocess import clean_text
 from preprocess import count_file
+from preprocess import clean_text
+from preprocess import tokenize
 
 from constants import DOC_FOLDER
 
@@ -36,9 +36,9 @@ class TFIDF(MRJob):
         ]
 
     def splitter(self, line):
-        tokenized_words = tokenize(line)
-        cleaned_words = clean_text(tokenized_words)
-        for word in cleaned_words.split():
+        cleaned_words = clean_text(line)
+        tokenized_words = tokenize(cleaned_words)
+        for word in tokenized_words.split():
             yield word
 
     # => (word, doc), 1

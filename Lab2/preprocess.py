@@ -41,18 +41,16 @@ def count_file(folder_path):
         file_count += len(files)
     return file_count
 
+# 数据清洗：保留中文字符，替换所有数字、英文字符、标点符号为空格
+def clean_text(text):
+    cleaned_text = re.sub(r'[^\u4e00-\u9fa5]+', ' ', text)
+    return cleaned_text
+
 # 分词处理
 def tokenize(text):
     words = jieba.cut_for_search(text)
     words = " ".join(words)
     return words
-
-# 先分词再去除标点符号，是因为标点符号有助于提高分词的精度
-
-# 数据清洗：保留中文字符，替换所有数字、英文字符、标点符号为空格
-def clean_text(text):
-    cleaned_text = re.sub(r'[^\u4e00-\u9fa5]+', ' ', text)
-    return cleaned_text
 
 if __name__ == "__main__":
     preprocess_document(DAT_DOC, DOC_FOLDER)
